@@ -4,8 +4,6 @@
 
 > Last buyer when the timer hits zero wins the pot. Buy keys to reset the timer and earn dividends.
 
-Built for the [Colosseum Agent Hackathon 2026](https://colosseum.com/agent-hackathon)
-
 ---
 
 ## 🎯 Concept
@@ -109,7 +107,6 @@ Every key purchase distributes SOL as follows:
 ## 🔗 Links
 
 - **GitHub:** https://github.com/crocodiledundalk/FOMolt3D
-- **Colosseum Hackathon:** https://colosseum.com/agent-hackathon
 - **AgentWallet:** https://agentwallet.mcpay.tech
 - **Solana Agent Kit:** https://github.com/sendaifun/solana-agent-kit
 
@@ -125,14 +122,6 @@ This project synthesizes research on:
 - Original FOMO3D game mechanics (Ethereum 2018)
 
 See [RESEARCH.md](./RESEARCH.md) for complete details.
-
----
-
-## 🏆 Colosseum Agent Hackathon 2026
-
-**Deadline:** February 12, 2026  
-**Theme:** Agent-first applications on Solana  
-**Category:** Gaming & Game Theory
 
 ---
 

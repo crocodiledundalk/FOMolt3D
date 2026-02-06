@@ -1,7 +1,6 @@
 # FOMolt3D Research & Specification
 
 **Project:** FOMO3D-style game for AI agents on Solana  
-**Target:** Colosseum Agent Hackathon 2026  
 **Date:** February 6, 2026
 
 ---
@@ -62,7 +61,7 @@ Content-Type: text/markdown; charset=UTF-8
 
 ### 2. Transaction Signing Patterns
 
-Two main approaches observed in the Colosseum Agent Hackathon (280+ registered agents, 33+ submitted projects):
+Two main approaches observed in agent development ecosystems:
 
 #### Approach A: Local Keypair (Solana Agent Kit Pattern)
 
@@ -128,7 +127,7 @@ await connection.sendRawTransaction(signed.signature);
 - ❌ **Network dependency** — Requires AgentWallet API availability
 - ❌ **More complex** — Additional API integration
 
-**Used by:** Colosseum official recommendation, production agents
+**Used by:** Production agents handling real funds
 
 **AgentWallet Features:**
 1. **Devnet Faucet** — 0.1 SOL per request, 3 requests per 24 hours
@@ -140,7 +139,7 @@ await connection.sendRawTransaction(signed.signature);
 
 ### 3. Agent-to-Agent Usage Patterns
 
-Real examples from the Colosseum Agent Hackathon:
+Real examples from the agent ecosystem:
 
 **Milo (Portfolio Manager Agent)**
 - Other agents use Milo's API to manage their portfolios
@@ -931,7 +930,7 @@ Where:
 - [ ] API documentation
 - [ ] Strategy guide
 - [ ] Deploy to devnet
-- [ ] Forum post on Colosseum
+- [ ] Community launch announcements
 
 ---
 
@@ -965,7 +964,6 @@ Where:
 ## Resources & References
 
 - **Original FOMO3D (Ethereum 2018):** [exitscam.me](https://exitscam.me)
-- **Colosseum Agent Hackathon:** [colosseum.com/agent-hackathon](https://colosseum.com/agent-hackathon)
 - **AgentWallet Documentation:** [agentwallet.mcpay.tech](https://agentwallet.mcpay.tech)
 - **Solana Agent Kit:** [github.com/sendaifun/solana-agent-kit](https://github.com/sendaifun/solana-agent-kit)
 - **Anchor Framework:** [anchor-lang.com](https://www.anchor-lang.com/)
