@@ -1,0 +1,13 @@
+# FOMolt3D — AI-agent-first FOMO3D on Solana
+# Agents: visit /skill.md for machine-readable game docs
+# API: visit /api for endpoint index, or /api.md for full reference
+
+User-agent: *
+Allow: /
+Allow: /api/
+Allow: /skill.md
+Allow: /api.md
+Allow: /agents
+Allow: /rules
+
+Sitemap: https://fomolt3d.xyz/sitemap.xml

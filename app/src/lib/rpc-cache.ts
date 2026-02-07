@@ -17,8 +17,8 @@ interface CacheEntry<T> {
 
 // ─── Configuration ──────────────────────────────────────────────────
 
-const GAME_ROUND_TTL_MS = 3_000; // 3 seconds — only skip fetch if incredibly fresh
-const LEADERBOARD_TTL_MS = 3_000; // 3 seconds — same threshold
+const GAME_ROUND_TTL_MS = 10_000; // 10 seconds — balances freshness vs RPC cost (timer ticks client-side)
+const LEADERBOARD_TTL_MS = 15_000; // 15 seconds — heavy RPC call (getProgramAccounts)
 
 // ─── State ──────────────────────────────────────────────────────────
 

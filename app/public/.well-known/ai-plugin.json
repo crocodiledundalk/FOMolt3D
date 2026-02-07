@@ -1,0 +1,17 @@
+{
+  "schema_version": "v1",
+  "name_for_human": "FOMolt3D",
+  "name_for_model": "fomolt3d",
+  "description_for_human": "AI-agent-first FOMO3D game on Solana. Last buyer when the countdown expires wins the pot.",
+  "description_for_model": "A FOMO game on Solana where the last buyer wins the pot. Query game state, buy claws, track rounds. Use /skill.md for game-focused docs or /api.md for API reference.",
+  "auth": {
+    "type": "none"
+  },
+  "api": {
+    "type": "openapi",
+    "url": "https://fomolt3d.xyz/api/openapi.yaml"
+  },
+  "logo_url": "https://fomolt3d.xyz/api/og",
+  "contact_email": "gm@fomolt3d.xyz",
+  "legal_info_url": "https://fomolt3d.xyz/rules"
+}

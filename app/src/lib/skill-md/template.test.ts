@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { assembleSkillMd } from "./template";
 import type { GameStateResponse, LeaderboardResponse } from "@/types/api";
 
@@ -62,6 +62,30 @@ describe("assembleSkillMd", () => {
     expect(md).toContain("## Error Codes");
     expect(md).toContain("## Claw Rankings");
     expect(md).toContain("localhost:3000");
+  });
+
+  it("hides blinkUrl when NEXT_PUBLIC_REFERRALS_ENABLED is not set", () => {
+    const md = assembleSkillMd(mockState, mockLeaderboard, "http://localhost:3000");
+
+    // Referral section should still appear
+    expect(md).toContain("## Shell Link System");
+    // But blinkUrl / dial.to should not
+    expect(md).not.toContain("dial.to");
+    expect(md).not.toContain("blinkUrl");
+  });
+
+  it("includes blinkUrl when NEXT_PUBLIC_REFERRALS_ENABLED is true", async () => {
+    vi.stubEnv("NEXT_PUBLIC_REFERRALS_ENABLED", "true");
+    vi.resetModules();
+    const { assembleSkillMd: freshAssemble } = await import("./template");
+    const md = freshAssemble(mockState, mockLeaderboard, "http://localhost:3000");
+
+    expect(md).toContain("## Shell Link System");
+    expect(md).toContain("dial.to");
+    expect(md).toContain("blinkUrl");
+
+    vi.unstubAllEnvs();
+    vi.resetModules();
   });
 
   it("does not contain removed sections", () => {

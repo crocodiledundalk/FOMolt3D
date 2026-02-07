@@ -1,4 +1,3 @@
-import { NextResponse } from "next/server";
 import {
   getReadOnlyProgram,
   getNextKeyPrice,
@@ -6,23 +5,20 @@ import {
   toApiGameState,
 } from "@/lib/sdk";
 import { calculateKeyPrice } from "@/lib/utils/bonding-curve";
-import { recordSnapshot } from "@/lib/state-history";
 import { getCachedGameRound } from "@/lib/rpc-cache";
 import type { GameStateResponse } from "@/types/api";
 
-export const dynamic = "force-dynamic";
-
-export async function GET() {
+/**
+ * Fetch game state on the server side.
+ * Used by page.tsx to pre-populate React Query cache for SSR.
+ * Same logic as /api/state but returns typed data instead of NextResponse.
+ */
+export async function fetchGameStateServer(): Promise<GameStateResponse | null> {
   try {
     const program = getReadOnlyProgram();
     const result = await getCachedGameRound(program);
 
-    if (!result) {
-      return NextResponse.json(
-        { error: "No game rounds found. The game has not been initialized." },
-        { status: 404 }
-      );
-    }
+    if (!result) return null;
 
     const { gameState: gs } = result;
     const gameState = toApiGameState(gs);
@@ -34,24 +30,14 @@ export async function GET() {
     );
     const phase = getGamePhase(gs);
 
-    // Record snapshot for price trajectory and pot momentum tracking
-    recordSnapshot(gs.totalKeys, gs.potLamports, keyPriceLamports);
-
-    const response: GameStateResponse = {
+    return {
       gameState,
       keyPriceLamports,
       nextKeyPriceLamports,
       phase,
     };
-
-    return NextResponse.json(response, {
-      headers: { "Cache-Control": "no-store, max-age=0" },
-    });
   } catch (err) {
-    console.error("Failed to fetch game state:", err);
-    return NextResponse.json(
-      { error: "Failed to fetch game state from chain" },
-      { status: 500 }
-    );
+    console.error("[SSR] Failed to fetch game state:", err);
+    return null;
   }
 }

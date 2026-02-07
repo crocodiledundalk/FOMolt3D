@@ -125,28 +125,57 @@ export async function fetchVaultBalance(
   return connection.getBalance(vaultPDA);
 }
 
+let cachedLatestRound = 1;
+
 /**
  * Find the current (latest) round by scanning backwards from a starting guess.
  * Returns the round number and its GameState, or null if no rounds exist.
  *
- * Strategy: try round 1, then scan upward to find the latest.
- * For most games, round count is low (< 100), so scanning is fast.
+ * Strategy: start from the last known round, then scan forward to find the latest.
+ * Falls back to scanning backward if the cached round no longer exists.
  */
 export async function findCurrentRound(
   program: Program<Fomolt3d>
 ): Promise<{ round: number; gameState: OnChainGameState } | null> {
-  // Start at round 1 (first round is always 1)
-  let round = 1;
+  // Start at last known round (first round is always 1)
+  let round = Math.max(1, cachedLatestRound);
   let latest: { round: number; gameState: OnChainGameState } | null = null;
 
   // Scan upward until we find a round that doesn't exist
   while (true) {
     const gs = await fetchGameState(program, round);
-    if (!gs) break;
+    if (!gs) {
+      if (latest) break;
+      if (round === 1) return null;
+
+      // Cached round was too high or stale: scan backward to find the last existing round.
+      let back = round - 1;
+      while (back >= 1) {
+        const backGs = await fetchGameState(program, back);
+        if (backGs) {
+          latest = { round: back, gameState: backGs };
+          if (backGs.active) {
+            cachedLatestRound = back;
+            return latest;
+          }
+          round = back + 1;
+          break;
+        }
+        back--;
+      }
+
+      if (!latest) return null;
+      continue;
+    }
     latest = { round, gameState: gs };
+    cachedLatestRound = round;
     // If this round is active, it's the current one
     if (gs.active) return latest;
     round++;
+  }
+
+  if (latest) {
+    cachedLatestRound = latest.round;
   }
 
   return latest;
