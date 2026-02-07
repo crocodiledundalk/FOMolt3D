@@ -41,11 +41,19 @@ function enqueueRawEvent(
 function enqueueCachedEvent(
   controller: ReadableStreamDefaultController,
   encoder: TextEncoder,
-  event: { type: string; data: Record<string, unknown>; key: string },
+  event: { type: string; signature: string; key: string; data: Record<string, unknown> },
   prefix: string
 ) {
   const id = `${prefix}-${++sseIdCounter}`;
-  const frame = `event: ${event.type}\nid: ${id}\ndata: ${JSON.stringify(event.data)}\n\n`;
+  // Reconstruct a flat ProgramEvent shape matching what live events send:
+  // { type, signature, key, ...data fields }
+  const payload = {
+    type: event.type,
+    signature: event.signature,
+    key: event.key,
+    ...event.data,
+  };
+  const frame = `event: ${event.type}\nid: ${id}\ndata: ${JSON.stringify(payload)}\n\n`;
   try {
     controller.enqueue(encoder.encode(frame));
   } catch {

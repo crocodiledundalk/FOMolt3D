@@ -1,7 +1,6 @@
 "use client";
 
 import { Suspense, useState } from "react";
-import dynamic from "next/dynamic";
 import { GameHero } from "./game-hero";
 import { GamePitch } from "./game-pitch";
 import { ReferralCTA } from "./referral-cta";
@@ -19,15 +18,6 @@ import { ModeToggle } from "@/components/ui/mode-toggle";
 import { AdminLink } from "@/components/admin/admin-link";
 import Link from "next/link";
 
-const BlinkCard = dynamic(
-  () => import("./blink-card").then((m) => ({ default: m.BlinkCard })),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="h-48 animate-pulse border-2 border-dashed border-border bg-bg-secondary" />
-    ),
-  }
-);
 
 export function Dashboard() {
   const [historyOpen, setHistoryOpen] = useState(false);
@@ -101,11 +91,6 @@ export function Dashboard() {
       {/* Referral */}
       <Suspense fallback={null}>
         <ReferralCTA />
-      </Suspense>
-
-      {/* Blink Card */}
-      <Suspense fallback={null}>
-        <BlinkCard />
       </Suspense>
 
       {/* Feed + Leaderboard */}

@@ -46,8 +46,11 @@ export async function POST(request: Request) {
 
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
 
+  const actionUrl = `${baseUrl}/api/actions/buy-keys?ref=${parsed.data.pubkey}`;
+
   return NextResponse.json({
-    referralUrl: `${baseUrl}/api/actions/buy-keys?ref=${parsed.data.pubkey}`,
+    referralUrl: actionUrl,
+    blinkUrl: `https://dial.to/?action=solana-action:${actionUrl}`,
     referrer: parsed.data.pubkey,
   });
 }

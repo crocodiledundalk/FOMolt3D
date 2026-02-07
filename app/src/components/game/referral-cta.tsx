@@ -74,12 +74,26 @@ export function ReferralCTA() {
     }
   }, [publicKey, anchor, gameData, connection, sendTransaction, queryClient]);
 
-  const referralUrl = address && origin ? `${origin}/api/actions/buy-keys?ref=${address}` : null;
+  // Raw ref link (for direct sharing, agents, embedding)
+  const refUrl = address && origin
+    ? `${origin}/api/actions/buy-keys?ref=${address}`
+    : null;
 
-  const copyLink = () => {
-    if (!referralUrl) return;
-    navigator.clipboard.writeText(referralUrl);
-    toast.success("Referral link copied!");
+  // Blink URL (renders interactive card on X/Twitter via dial.to)
+  const blinkUrl = refUrl
+    ? `https://dial.to/?action=solana-action:${refUrl}`
+    : null;
+
+  const copyRefLink = () => {
+    if (!refUrl) return;
+    navigator.clipboard.writeText(refUrl);
+    toast.success("Ref link copied!");
+  };
+
+  const copyBlinkUrl = () => {
+    if (!blinkUrl) return;
+    navigator.clipboard.writeText(blinkUrl);
+    toast.success("Blink for X copied!");
   };
 
   // Agent mode: compact API-oriented CTA
@@ -124,20 +138,23 @@ export function ReferralCTA() {
             Share your referral link and earn <span className="font-bold text-claw-green">{referralPct}%</span> of
             every transaction by referred agents or humans.
           </p>
-          {referralUrl && (
-            <div className="mt-2 flex items-stretch">
-              <div className="flex items-center overflow-hidden border-2 border-claw-green/30 border-r-0 bg-bg-primary px-3 py-2 text-xs tabular-nums text-text-secondary">
-                {referralUrl.length > 50 ? `${referralUrl.slice(0, 50)}...` : referralUrl}
-              </div>
+          {refUrl && (
+            <div className="mt-2 flex items-center gap-2">
               <button
-                onClick={copyLink}
+                onClick={copyRefLink}
                 className="border-2 border-claw-green/30 bg-claw-green/10 px-4 py-2 text-sm font-bold text-claw-green transition-colors hover:bg-claw-green/20"
               >
-                Copy Link
+                Copy Ref Link
+              </button>
+              <button
+                onClick={copyBlinkUrl}
+                className="border-2 border-claw-cyan/30 bg-claw-cyan/10 px-4 py-2 text-sm font-bold text-claw-cyan transition-colors hover:bg-claw-cyan/20"
+              >
+                Copy Blink for X
               </button>
             </div>
           )}
-          <p className="text-xs text-text-muted">share this link to start earning referral rewards</p>
+          <p className="text-xs text-text-muted">use the Blink for X/Twitter, the ref link everywhere else</p>
         </div>
       </section>
     );
@@ -155,13 +172,21 @@ export function ReferralCTA() {
             <span className="text-lg"><Emoji label="link">&#x1F517;</Emoji></span>
             Your Referrals
           </h3>
-          {referralUrl && (
-            <button
-              onClick={copyLink}
-              className="border border-claw-green/30 bg-claw-green/10 px-3 py-1 text-xs font-bold text-claw-green transition-colors hover:bg-claw-green/20"
-            >
-              Copy Link
-            </button>
+          {refUrl && (
+            <div className="flex items-center gap-2">
+              <button
+                onClick={copyRefLink}
+                className="border border-claw-green/30 bg-claw-green/10 px-3 py-1 text-xs font-bold text-claw-green transition-colors hover:bg-claw-green/20"
+              >
+                Copy Ref Link
+              </button>
+              <button
+                onClick={copyBlinkUrl}
+                className="border border-claw-cyan/30 bg-claw-cyan/10 px-3 py-1 text-xs font-bold text-claw-cyan transition-colors hover:bg-claw-cyan/20"
+              >
+                Copy Blink for X
+              </button>
+            </div>
           )}
         </div>
 
@@ -211,19 +236,40 @@ export function ReferralCTA() {
 function ReferralOpportunity({ referralPct }: { referralPct: number }) {
   return (
     <section className="border-2 border-claw-green/30 bg-bg-secondary p-5">
-      <div className="flex flex-col items-center gap-3 text-center">
+      <div className="flex flex-col items-center gap-4 text-center">
         <span className="text-3xl"><Emoji label="referral claw">&#x1F517;&#x1F99E;</Emoji></span>
         <h3 className="text-lg font-bold text-claw-green">
-          Earn {referralPct}% on Every Referred Transaction
+          Referral Program &mdash; Earn {referralPct}% Per Transaction
         </h3>
-        <p className="max-w-md text-sm text-text-secondary">
-          Share your referral link and earn <span className="font-bold text-claw-green">{referralPct}%</span> of
-          every transaction by referred agents or humans.
+        <p className="max-w-lg text-sm text-text-secondary">
+          Every player who joins through your referral link earns you{" "}
+          <span className="font-bold text-claw-green">{referralPct}%</span> of their
+          transaction &mdash; on every buy, not just the first.
         </p>
+
+        <div className="grid w-full max-w-lg grid-cols-3 gap-3 text-center">
+          <div className="border border-border bg-bg-primary p-3">
+            <p className="text-lg font-bold text-claw-green">{referralPct}%</p>
+            <p className="text-xs text-text-muted">Per referral buy</p>
+          </div>
+          <div className="border border-border bg-bg-primary p-3">
+            <p className="text-lg font-bold text-text-primary"><Emoji label="infinity">&#x267E;&#xFE0F;</Emoji></p>
+            <p className="text-xs text-text-muted">Unlimited referrals</p>
+          </div>
+          <div className="border border-border bg-bg-primary p-3">
+            <p className="text-lg font-bold text-text-primary"><Emoji label="lock">&#x1F512;</Emoji></p>
+            <p className="text-xs text-text-muted">Permanent link</p>
+          </div>
+        </div>
+
+        <div className="max-w-lg space-y-1 text-left text-xs text-text-muted">
+          <p><span className="font-semibold text-text-secondary">How it works:</span> Connect your wallet to generate a unique referral link. Share it with agents or humans. When they buy keys using your link, {referralPct}% of their cost goes directly to your referral balance, claimable at any time.</p>
+        </div>
+
         <div className="mt-1">
           <WalletConnect />
         </div>
-        <p className="text-xs text-text-muted">connect a wallet to generate your referral link</p>
+        <p className="text-xs text-text-muted">Connect a wallet to generate your referral link</p>
       </div>
     </section>
   );

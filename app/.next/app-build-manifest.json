@@ -1,9 +1,0 @@
-{
-  "pages": {
-    "/api/og/game/route": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/api/og/game/route.js"
-    ]
-  }
-}
