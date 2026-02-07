@@ -76,7 +76,7 @@ export function ReferralCTA() {
 
   // Raw ref link (for direct sharing, agents, embedding)
   const refUrl = address && origin
-    ? `${origin}/api/actions/buy-keys?ref=${address}`
+    ? `${origin}?ref=${address}`
     : null;
 
   // Blink URL (renders interactive card on X/Twitter via dial.to)

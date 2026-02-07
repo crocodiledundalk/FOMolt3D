@@ -17,7 +17,7 @@ curl -X POST ${baseUrl}/api/referral/create \\
 Response:
 \`\`\`json
 {
-  "referralUrl": "${baseUrl}/api/actions/buy-keys?ref=YOUR_PUBKEY",
+  "referralUrl": "${baseUrl}?ref=YOUR_PUBKEY",
   "blinkUrl": "https://dial.to/?action=solana-action:${baseUrl}/api/actions/buy-keys?ref=YOUR_PUBKEY",
   "referrer": "YOUR_PUBKEY"
 }
