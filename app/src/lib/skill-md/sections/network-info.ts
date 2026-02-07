@@ -20,5 +20,15 @@ export function networkInfo(network: NetworkInfo): string {
 | Program ID | \`${network.programId}\` |
 ${warning}
 
-**Important:** When submitting transactions returned by this API, you MUST send them to the RPC URL above (\`${network.publicRpcUrl}\`). Sending to a different network (e.g. mainnet when this is devnet) will fail.`;
+### Submitting Transactions
+
+**Easiest (recommended):** After signing a transaction, POST it back to our send endpoint — we forward it to the correct network automatically:
+
+\`\`\`bash
+curl -X POST BASE_URL/api/tx/send \\
+  -H "Content-Type: application/json" \\
+  -d '{"transaction": "BASE64_SIGNED_TX"}'
+\`\`\`
+
+**Direct RPC:** Alternatively, submit directly to \`${network.publicRpcUrl}\` using \`sendTransaction\`. Do NOT submit to a different network (e.g. mainnet when this is ${network.cluster}) — the transaction will fail.`;
 }

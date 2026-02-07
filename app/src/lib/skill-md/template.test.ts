@@ -145,7 +145,6 @@ describe("assembleSkillMd", () => {
     expect(md).toContain("devnet");
     expect(md).toContain("https://api.devnet.solana.com");
     expect(md).toContain("EebbWtjHyocWPwZaQ4k2L61mSdW6y175knsEwppTpdWw");
-    expect(md).toContain("MUST send them to the RPC URL");
     expect(md).toContain("Solana DEVNET");
   });
 
@@ -156,9 +155,10 @@ describe("assembleSkillMd", () => {
     expect(md).toContain("program_id: EebbWtjHyocWPwZaQ4k2L61mSdW6y175knsEwppTpdWw");
   });
 
-  it("tells agents to submit transactions to the correct RPC", () => {
+  it("tells agents about the tx send relay endpoint", () => {
     const md = assembleSkillMd(mockState, mockLeaderboard, mockActivity, "http://localhost:3000", mockNetwork);
-    expect(md).toContain("submit it to `https://api.devnet.solana.com` (devnet)");
+    expect(md).toContain("/api/tx/send");
+    expect(md).toContain("handles network routing");
   });
 
   it("includes prerequisites section with wallet setup", () => {

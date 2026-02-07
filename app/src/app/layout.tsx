@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Providers } from "@/providers";
 import "./globals.css";
 
-const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://fomolt3d.xyz";
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://fomolt3d.com";
 
 export const viewport: Viewport = {
   width: "device-width",

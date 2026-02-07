@@ -5,6 +5,7 @@ import {
   trackReferralCreation,
 } from "@/lib/referral-tracking";
 import { REFERRALS_ENABLED } from "@/lib/feature-flags";
+import { getBaseUrl } from "@/lib/base-url";
 
 /**
  * Referral link generation with rate limiting.
@@ -45,7 +46,7 @@ export async function POST(request: Request) {
   // Track the creation event
   trackReferralCreation(parsed.data.pubkey);
 
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+  const baseUrl = getBaseUrl(request);
 
   const referralUrl = `${baseUrl}?ref=${parsed.data.pubkey}`;
   const actionUrl = `${baseUrl}/api/actions/buy-keys?ref=${parsed.data.pubkey}`;

@@ -16,6 +16,7 @@ import { recordSnapshot } from "@/lib/state-history";
 import { getCachedEvents } from "@/lib/event-cache";
 import { getActivityMetrics } from "@/lib/activity-metrics";
 import { getCluster, getPublicRpcUrl, getProgramId } from "@/lib/network";
+import { getBaseUrl } from "@/lib/base-url";
 import type { ActivityMetrics } from "@/lib/activity-metrics";
 import type { GameStateResponse, LeaderboardResponse } from "@/types/api";
 import type { LeaderboardEntry, ReferralEntry } from "@/types/game";
@@ -153,7 +154,7 @@ export async function GET(request: Request) {
       state.gameState.totalPlayers
     );
 
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+    const baseUrl = getBaseUrl(request);
     const network = {
       cluster: getCluster(),
       publicRpcUrl: getPublicRpcUrl(),

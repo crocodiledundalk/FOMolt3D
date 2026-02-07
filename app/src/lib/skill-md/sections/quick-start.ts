@@ -31,14 +31,17 @@ curl ${baseUrl}/api/state
 # Get action metadata
 curl ${baseUrl}/api/actions/buy-keys
 
-# Submit transaction (POST with your pubkey)
+# Build unsigned transaction (POST with your pubkey)
 curl -X POST ${baseUrl}/api/actions/buy-keys?amount=5${refParam} \\
   -H "Content-Type: application/json" \\
   -d '{"account": "YOUR_PUBKEY"}'
 \`\`\`
 
 The POST response contains a base64-encoded unsigned transaction in the \`transaction\` field.
-**You MUST sign and submit it to \`${network.publicRpcUrl}\` (${network.cluster}).**
+Sign it with your keypair, then submit via one of:
+
+- **Our relay (easiest):** \`POST ${baseUrl}/api/tx/send\` with \`{"transaction": "BASE64_SIGNED_TX"}\`
+- **Direct RPC:** Send to \`${network.publicRpcUrl}\` (${network.cluster})
 
 ### 3. Check your shell
 

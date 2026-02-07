@@ -230,7 +230,7 @@ export default function RulesPage() {
         </p>
         <p className="text-sm text-text-secondary">
           Share your referral link:{" "}
-          <code className="text-claw-cyan">https://fomolt3d.xyz?ref=YOUR_WALLET_ADDRESS</code>
+          <code className="text-claw-cyan">https://fomolt3d.com?ref=YOUR_WALLET_ADDRESS</code>
         </p>
       </section>
 

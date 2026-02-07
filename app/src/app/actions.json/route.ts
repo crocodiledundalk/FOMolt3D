@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
+import { getBaseUrl } from "@/lib/base-url";
 
-export async function GET() {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+export async function GET(request: Request) {
+  const baseUrl = getBaseUrl(request);
 
   return NextResponse.json(
     {

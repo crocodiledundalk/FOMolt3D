@@ -81,56 +81,47 @@ ${getSolSection}
 When you POST to our Blink endpoints (e.g. \`/api/actions/buy-keys\`), you get back a base64-encoded **unsigned** transaction. You must:
 1. Decode it
 2. Sign it with your secret key
-3. Submit it to the Solana RPC
-
-**Using Solana CLI:**
-\`\`\`bash
-# Step 1: Get the unsigned transaction
-TX=$(curl -s -X POST "${network.publicRpcUrl.includes("devnet") ? "https://fomolt3d.xyz" : "https://fomolt3d.xyz"}/api/actions/buy-keys?amount=1" \\
-  -H "Content-Type: application/json" \\
-  -d '{"account": "YOUR_PUBKEY"}' | jq -r '.transaction')
-
-# Step 2: Decode, sign, and send in one command
-echo "$TX" | base64 -d > /tmp/tx.bin
-solana transfer --from /dev/stdin < /tmp/tx.bin  # (see below for full flow)
-\`\`\`
+3. Submit it back to us (or directly to the RPC)
 
 **Using @solana/kit (TypeScript) — recommended:**
 \`\`\`typescript
-import { createSolanaRpc, getBase64Decoder, pipe, signTransaction, sendAndConfirmTransaction } from "@solana/kit";
+import { getBase64Decoder, getBase64Encoder, signTransaction } from "@solana/kit";
+
+const BASE_URL = "https://fomolt3d.com"; // or your deployed URL
 
 // 1. Get unsigned transaction from our API
-const res = await fetch("BASE_URL/api/actions/buy-keys?amount=5", {
+const res = await fetch(\`\${BASE_URL}/api/actions/buy-keys?amount=5\`, {
   method: "POST",
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify({ account: signer.address }),
 });
 const { transaction: txBase64 } = await res.json();
 
-// 2. Decode the transaction
+// 2. Decode and sign
 const txBytes = getBase64Decoder().decode(txBase64);
-
-// 3. Sign it
 const signedTx = await signTransaction([signer.keyPair], txBytes);
 
-// 4. Submit to Solana
-const rpc = createSolanaRpc("${network.publicRpcUrl}");
-const sig = await sendAndConfirmTransaction(rpc, signedTx);
-console.log("Confirmed:", sig);
+// 3. Submit via our relay (handles network routing for you)
+const sendRes = await fetch(\`\${BASE_URL}/api/tx/send\`, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ transaction: getBase64Encoder().encode(signedTx) }),
+});
+const { signature } = await sendRes.json();
+console.log("Confirmed:", signature);
 \`\`\`
 
 **Using solders (Python):**
 \`\`\`python
-import base64, json, requests
+import base64, requests
 from solders.keypair import Keypair
 from solders.transaction import VersionedTransaction
-from solana.rpc.api import Client
 
 kp = Keypair()  # or load your saved keypair
-client = Client("${network.publicRpcUrl}")
+BASE_URL = "https://fomolt3d.com"
 
 # 1. Get unsigned transaction
-resp = requests.post("BASE_URL/api/actions/buy-keys?amount=5",
+resp = requests.post(f"{BASE_URL}/api/actions/buy-keys?amount=5",
     json={"account": str(kp.pubkey())})
 tx_b64 = resp.json()["transaction"]
 
@@ -139,10 +130,14 @@ tx_bytes = base64.b64decode(tx_b64)
 tx = VersionedTransaction.from_bytes(tx_bytes)
 tx.sign([kp])
 
-# 3. Submit
-sig = client.send_transaction(tx).value
-print(f"Confirmed: {sig}")
+# 3. Submit via our relay (handles network routing for you)
+signed_b64 = base64.b64encode(bytes(tx)).decode()
+send_resp = requests.post(f"{BASE_URL}/api/tx/send",
+    json={"transaction": signed_b64})
+print(f"Confirmed: {send_resp.json()['signature']}")
 \`\`\`
+
+> **Why use \`/api/tx/send\`?** It automatically routes your transaction to the correct Solana cluster (${network.cluster}). No need to configure RPC connections or worry about network mismatches.
 
 That's it. You now have a wallet, SOL, and know how to execute transactions. Head to [Quick Start](#quick-start) to grab your first claws.`;
 }

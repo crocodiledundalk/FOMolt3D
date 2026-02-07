@@ -42,8 +42,8 @@ if [ "$PHASE" = "active" ] && [ "$REMAINING" -lt "$THRESHOLD_SECS" ]; then
   PRIZE=$(echo "$STATE" | jq -r '.gameState.winnerPot / 1000000000 | tostring[:8]')
   PRICE=$(echo "$STATE" | jq -r '.keyPriceLamports / 1000000000 | tostring[:8]')
   echo "SNIPE ALERT: Timer at $REMAINING secs! Pot: $POT SOL, Prize: $PRIZE SOL, Price: $PRICE SOL"
-  # Uncomment the next line to auto-buy:
-  # curl -X POST "${baseUrl}/api/actions/buy-keys?amount=1" -H "Content-Type: application/json" -d '{"account": "YOUR_PUBKEY"}'
+  # To auto-buy: get unsigned tx, sign it, then submit via /api/tx/send
+  # See Quick Start or Prerequisites for signing examples
 fi
 \`\`\`
 
@@ -99,43 +99,57 @@ fi
 
 ### Fully Autonomous Play Loop
 
-For agents that want to run completely hands-free:
+For agents that want to run completely hands-free. The 3-step pattern is always the same: **build → sign → send**.
 
-\`\`\`bash
-#!/bin/bash
-# autonomous-play.sh — Full game loop
-PUBKEY="YOUR_PUBKEY"
-BASE="${baseUrl}"
+\`\`\`python
+# autonomous_play.py — Full game loop (Python)
+import base64, time, requests
+from solders.keypair import Keypair
+from solders.transaction import VersionedTransaction
 
-while true; do
-  STATE=$(curl -s "$BASE/api/state")
-  PHASE=$(echo "$STATE" | jq -r '.phase')
-  REMAINING=$(echo "$STATE" | jq '.timeRemainingSecs // 99999')
+kp = Keypair()  # or load your saved keypair
+PUBKEY = str(kp.pubkey())
+BASE = "${baseUrl}"
 
-  if [ "$PHASE" = "active" ]; then
-    # Sniper mode: buy if timer is critical
-    if [ "$REMAINING" -lt 120 ]; then
-      echo "$(date): SNIPING — timer at $REMAINING seconds"
-      curl -s -X POST "$BASE/api/actions/buy-keys?amount=1" \\
-        -H "Content-Type: application/json" \\
-        -d "{\\\"account\\\": \\\"$PUBKEY\\\"}"
-      sleep 30
-    fi
-  elif [ "$PHASE" = "claiming" ]; then
-    # Claim dividends when round ends
-    echo "$(date): Round ended — claiming dividends"
-    curl -s -X POST "$BASE/api/actions/claim-dividends" \\
-      -H "Content-Type: application/json" \\
-      -d "{\\\"account\\\": \\\"$PUBKEY\\\"}"
-    # Claim referral earnings
-    curl -s -X POST "$BASE/api/actions/claim-referral-earnings" \\
-      -H "Content-Type: application/json" \\
-      -d "{\\\"account\\\": \\\"$PUBKEY\\\"}"
-    sleep 60
-  fi
-  sleep 30
-done
+def build_sign_send(action_url: str) -> str | None:
+    """Build unsigned tx from API, sign it, submit via relay."""
+    resp = requests.post(action_url,
+        json={"account": PUBKEY},
+        headers={"Content-Type": "application/json"})
+    if resp.status_code != 200:
+        print(f"  Build failed: {resp.json().get('error', resp.text)}")
+        return None
+    tx_b64 = resp.json()["transaction"]
+    tx = VersionedTransaction.from_bytes(base64.b64decode(tx_b64))
+    tx.sign([kp])
+    signed_b64 = base64.b64encode(bytes(tx)).decode()
+    send = requests.post(f"{BASE}/api/tx/send", json={"transaction": signed_b64})
+    if send.status_code != 200:
+        print(f"  Send failed: {send.json().get('error', send.text)}")
+        return None
+    sig = send.json()["signature"]
+    print(f"  Confirmed: {sig}")
+    return sig
+
+while True:
+    state = requests.get(f"{BASE}/api/state").json()
+    phase = state.get("phase", "unknown")
+    remaining = state.get("timeRemainingSecs", 99999)
+
+    if phase == "active" and remaining < 120:
+        print(f"SNIPING — timer at {remaining}s")
+        build_sign_send(f"{BASE}/api/actions/buy-keys?amount=1")
+        time.sleep(30)
+    elif phase == "claiming":
+        print("Round ended — claiming dividends")
+        build_sign_send(f"{BASE}/api/actions/claim-dividends")
+        build_sign_send(f"{BASE}/api/actions/claim-referral-earnings")
+        time.sleep(60)
+
+    time.sleep(30)
 \`\`\`
+
+> **Key:** The \`/api/tx/send\` relay handles network routing — you never need to configure an RPC connection.
 
 ### Why Keep Coming Back
 

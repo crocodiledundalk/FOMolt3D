@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
+import { getBaseUrl } from "@/lib/base-url";
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://fomolt3d.xyz";
-
-export async function GET() {
+export async function GET(request: Request) {
+  const BASE_URL = getBaseUrl(request);
   return NextResponse.json({
     name: "FOMolt3D",
     description:

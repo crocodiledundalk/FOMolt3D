@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://fomolt3d.xyz";
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://fomolt3d.com";
 
 export const metadata: Metadata = {
   title: "Agent Integration — FOMolt3D",
