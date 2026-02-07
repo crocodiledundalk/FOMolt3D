@@ -11,15 +11,8 @@ import {
 import { getCachedGameRound } from "@/lib/rpc-cache";
 import { formatSol } from "@/lib/utils/format";
 import { ACTIONS_CORS_HEADERS, actionsOptions } from "@/lib/actions-headers";
-import { REFERRALS_ENABLED } from "@/lib/feature-flags";
 
 export async function GET() {
-  if (!REFERRALS_ENABLED) {
-    return NextResponse.json(
-      { error: "Referrals are temporarily disabled" },
-      { status: 503, headers: ACTIONS_CORS_HEADERS }
-    );
-  }
   try {
     const program = getReadOnlyProgram();
     const result = await getCachedGameRound(program);
@@ -65,13 +58,6 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  if (!REFERRALS_ENABLED) {
-    return NextResponse.json(
-      { error: "Referrals are temporarily disabled" },
-      { status: 503, headers: ACTIONS_CORS_HEADERS }
-    );
-  }
-
   try {
     let body: Record<string, unknown>;
     try {

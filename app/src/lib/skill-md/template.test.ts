@@ -1,4 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
+import { assembleSkillMd } from "./template";
 import type { GameStateResponse, LeaderboardResponse } from "@/types/api";
 
 const mockState: GameStateResponse = {
@@ -41,10 +42,7 @@ const mockLeaderboard: LeaderboardResponse = {
 };
 
 describe("assembleSkillMd", () => {
-  it("produces valid markdown with all sections (referrals disabled)", async () => {
-    vi.stubEnv("NEXT_PUBLIC_REFERRALS_ENABLED", "false");
-    // Re-import to pick up fresh env
-    const { assembleSkillMd } = await import("./template");
+  it("produces valid markdown with all sections", () => {
     const md = assembleSkillMd(mockState, mockLeaderboard, "http://localhost:3000");
 
     // Should not contain undefined, null, or NaN
@@ -60,38 +58,42 @@ describe("assembleSkillMd", () => {
     expect(md).toContain("## API Reference");
     expect(md).toContain("## Monitoring");
     expect(md).toContain("## Income Opportunities");
+    expect(md).toContain("## Shell Link System");
     expect(md).toContain("## Error Codes");
     expect(md).toContain("## Claw Rankings");
     expect(md).toContain("localhost:3000");
-
-    // Referral section should NOT appear when disabled
-    expect(md).not.toContain("## Shell Link System");
-
-    vi.unstubAllEnvs();
   });
 
-  it("includes referral section when enabled", async () => {
-    vi.stubEnv("NEXT_PUBLIC_REFERRALS_ENABLED", "true");
-    // Dynamic import to pick up env change (modules are cached, so reset first)
-    vi.resetModules();
-    const { assembleSkillMd } = await import("./template");
+  it("hides blinkUrl when NEXT_PUBLIC_REFERRALS_ENABLED is not set", () => {
     const md = assembleSkillMd(mockState, mockLeaderboard, "http://localhost:3000");
 
+    // Referral section should still appear
     expect(md).toContain("## Shell Link System");
-    expect(md).toContain("shell link");
+    // But blinkUrl / dial.to should not
+    expect(md).not.toContain("dial.to");
+    expect(md).not.toContain("blinkUrl");
+  });
+
+  it("includes blinkUrl when NEXT_PUBLIC_REFERRALS_ENABLED is true", async () => {
+    vi.stubEnv("NEXT_PUBLIC_REFERRALS_ENABLED", "true");
+    vi.resetModules();
+    const { assembleSkillMd: freshAssemble } = await import("./template");
+    const md = freshAssemble(mockState, mockLeaderboard, "http://localhost:3000");
+
+    expect(md).toContain("## Shell Link System");
+    expect(md).toContain("dial.to");
+    expect(md).toContain("blinkUrl");
 
     vi.unstubAllEnvs();
     vi.resetModules();
   });
 
-  it("does not contain removed sections", async () => {
-    const { assembleSkillMd } = await import("./template");
+  it("does not contain removed sections", () => {
     const md = assembleSkillMd(mockState, mockLeaderboard, "http://localhost:3000");
     expect(md).not.toContain("## Strategy Guide");
   });
 
-  it("includes live game data in pitch", async () => {
-    const { assembleSkillMd } = await import("./template");
+  it("includes live game data in pitch", () => {
     const md = assembleSkillMd(mockState, mockLeaderboard, "http://localhost:3000");
 
     // Should include pot value
@@ -106,18 +108,17 @@ describe("assembleSkillMd", () => {
     expect(md).toContain(":1");
   });
 
-  it("includes leaderboard entries with type badges", async () => {
-    const { assembleSkillMd } = await import("./template");
+  it("includes leaderboard entries with type badges", () => {
     const md = assembleSkillMd(mockState, mockLeaderboard, "http://localhost:3000");
     expect(md).toContain("AgNt");
     expect(md).toContain("85");
   });
 
-  it("uses crustacean terminology", async () => {
-    const { assembleSkillMd } = await import("./template");
+  it("uses crustacean terminology", () => {
     const md = assembleSkillMd(mockState, mockLeaderboard, "http://localhost:3000");
     expect(md).toContain("King Claw");
     expect(md).toContain("claws");
     expect(md).toContain("scraps");
+    expect(md).toContain("shell link");
   });
 });

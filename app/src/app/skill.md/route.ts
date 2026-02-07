@@ -13,7 +13,6 @@ import { calculateKeyPrice } from "@/lib/utils/bonding-curve";
 import { assembleSkillMd } from "@/lib/skill-md/template";
 import { trackReferralVisit } from "@/lib/referral-tracking";
 import { recordSnapshot } from "@/lib/state-history";
-import { REFERRALS_ENABLED } from "@/lib/feature-flags";
 import type { GameStateResponse, LeaderboardResponse } from "@/types/api";
 import type { LeaderboardEntry, ReferralEntry } from "@/types/game";
 
@@ -24,16 +23,14 @@ export async function GET(request: Request) {
     const program = getReadOnlyProgram();
     const result = await getCachedGameRound(program);
 
-    // Extract ?ref= query param for referral embedding (gated behind feature flag)
-    let referrer: string | undefined;
-    if (REFERRALS_ENABLED) {
-      const url = new URL(request.url);
-      const refParam = url.searchParams.get("ref");
-      referrer = refParam && /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(refParam) ? refParam : undefined;
+    // Extract ?ref= query param for referral embedding
+    const url = new URL(request.url);
+    const refParam = url.searchParams.get("ref");
+    const referrer = refParam && /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(refParam) ? refParam : undefined;
 
-      if (referrer) {
-        trackReferralVisit(referrer);
-      }
+    // Track referral visit
+    if (referrer) {
+      trackReferralVisit(referrer);
     }
 
     let state: GameStateResponse;
@@ -120,30 +117,27 @@ export async function GET(request: Request) {
         }));
 
       // Top referrers: group by referrer field, count distinct referred players
-      let topReferrers: ReferralEntry[] = [];
-      if (REFERRALS_ENABLED) {
-        const referralCounts = new Map<string, number>();
-        const referrerEarnings = new Map<string, number>();
-        for (const p of players) {
-          if (p.referrer) {
-            const refKey = p.referrer.toBase58();
-            referralCounts.set(refKey, (referralCounts.get(refKey) ?? 0) + 1);
-          }
-          if (p.referralEarningsLamports > 0) {
-            referrerEarnings.set(p.player.toBase58(), p.referralEarningsLamports);
-          }
+      const referralCounts = new Map<string, number>();
+      const referrerEarnings = new Map<string, number>();
+      for (const p of players) {
+        if (p.referrer) {
+          const refKey = p.referrer.toBase58();
+          referralCounts.set(refKey, (referralCounts.get(refKey) ?? 0) + 1);
         }
-        const allReferrers = new Set([...referralCounts.keys(), ...referrerEarnings.keys()]);
-        topReferrers = [...allReferrers]
-          .map((ref) => ({
-            referrer: ref,
-            referrals: referralCounts.get(ref) ?? 0,
-            totalEarnings: referrerEarnings.get(ref) ?? 0,
-          }))
-          .filter((r) => r.totalEarnings > 0 || r.referrals > 0)
-          .sort((a, b) => b.totalEarnings - a.totalEarnings)
-          .slice(0, 10);
+        if (p.referralEarningsLamports > 0) {
+          referrerEarnings.set(p.player.toBase58(), p.referralEarningsLamports);
+        }
       }
+      const allReferrers = new Set([...referralCounts.keys(), ...referrerEarnings.keys()]);
+      const topReferrers: ReferralEntry[] = [...allReferrers]
+        .map((ref) => ({
+          referrer: ref,
+          referrals: referralCounts.get(ref) ?? 0,
+          totalEarnings: referrerEarnings.get(ref) ?? 0,
+        }))
+        .filter((r) => r.totalEarnings > 0 || r.referrals > 0)
+        .sort((a, b) => b.totalEarnings - a.totalEarnings)
+        .slice(0, 10);
 
       leaderboardData = { keyHolders, dividendEarners, topReferrers };
     }

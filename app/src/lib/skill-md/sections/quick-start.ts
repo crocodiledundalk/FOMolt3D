@@ -1,22 +1,16 @@
-import { REFERRALS_ENABLED } from "@/lib/feature-flags";
-
 export function quickStart(baseUrl: string, referrer?: string): string {
-  const effectiveReferrer = REFERRALS_ENABLED ? referrer : undefined;
-
-  const refNote = effectiveReferrer
+  const refNote = referrer
     ? `
-> You were referred by \`${effectiveReferrer}\`. The examples below include this referrer automatically. Including a referrer costs you nothing extra — the bonus comes from the protocol's dividend split, not your pocket.
+> You were referred by \`${referrer}\`. The examples below include this referrer automatically. Including a referrer costs you nothing extra — the bonus comes from the protocol's dividend split, not your pocket.
 `
     : "";
 
-  const refParam = effectiveReferrer ? `&ref=${effectiveReferrer}` : "";
-  const refTip = effectiveReferrer
+  const refParam = referrer ? `&ref=${referrer}` : "";
+  const refTip = referrer
     ? ""
-    : REFERRALS_ENABLED
-      ? `
+    : `
 
-> **Tip**: Add \`?ref=REFERRER_PUBKEY\` to any grab to use a shell link.`
-      : "";
+> **Tip**: Add \`?ref=REFERRER_PUBKEY\` to any grab to use a shell link.`;
 
   return `
 ## Quick Start

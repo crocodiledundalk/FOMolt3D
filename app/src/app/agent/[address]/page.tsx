@@ -9,7 +9,6 @@ import {
 import { getCachedGameRound } from "@/lib/rpc-cache";
 import { formatSol, formatAddress } from "@/lib/utils/format";
 import { pubkeySchema } from "@/lib/validations/game";
-import { REFERRALS_ENABLED } from "@/lib/feature-flags";
 
 export default async function AgentPage({
   params,
@@ -81,22 +80,18 @@ export default async function AgentPage({
               value={`${formatSol(playerState.claimedDividendsLamports)} SOL`}
               accent
             />
-            {REFERRALS_ENABLED && (
-              <StatCard
-                label="Referral Earnings"
-                value={`${formatSol(playerState.referralEarningsLamports)} SOL`}
-              />
-            )}
-            {REFERRALS_ENABLED && (
-              <StatCard
-                label="Referrer"
-                value={
-                  playerState.referrer
-                    ? formatAddress(playerState.referrer.toBase58())
-                    : "None"
-                }
-              />
-            )}
+            <StatCard
+              label="Referral Earnings"
+              value={`${formatSol(playerState.referralEarningsLamports)} SOL`}
+            />
+            <StatCard
+              label="Referrer"
+              value={
+                playerState.referrer
+                  ? formatAddress(playerState.referrer.toBase58())
+                  : "None"
+              }
+            />
           </div>
 
           {/* Status */}

@@ -22,8 +22,11 @@ export function ShareButton({ variant = "compact", className = "" }: ShareButton
 
   if (!origin) return null;
 
-  const walletRef = REFERRALS_ENABLED && publicKey ? `?ref=${publicKey.toBase58()}` : "";
-  const blinkUrl = `https://dial.to/?action=solana-action:${origin}/api/actions/buy-keys${walletRef}`;
+  const walletRef = publicKey ? `?ref=${publicKey.toBase58()}` : "";
+  const actionUrl = `${origin}/api/actions/buy-keys${walletRef}`;
+  const shareLink = REFERRALS_ENABLED
+    ? `https://dial.to/?action=solana-action:${actionUrl}`
+    : `${origin}${walletRef}`;
 
   const potText = gameData
     ? `${formatSol(gameData.gameState.potLamports, 2)} SOL`
@@ -33,7 +36,7 @@ export function ShareButton({ variant = "compact", className = "" }: ShareButton
     `The pot is ${potText} and counting. Last claw grabber takes 48%. Are you brave enough?\n\n`
   );
 
-  const shareUrl = `https://twitter.com/intent/tweet?text=${tweetText}&url=${encodeURIComponent(blinkUrl)}`;
+  const shareUrl = `https://twitter.com/intent/tweet?text=${tweetText}&url=${encodeURIComponent(shareLink)}`;
 
   const handleShare = () => {
     window.open(shareUrl, "_blank", "noopener,noreferrer");

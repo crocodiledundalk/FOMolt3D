@@ -14,12 +14,6 @@ import { REFERRALS_ENABLED } from "@/lib/feature-flags";
  * rate limits (10 per address per hour), and returns a formatted referral URL.
  */
 export async function POST(request: Request) {
-  if (!REFERRALS_ENABLED) {
-    return NextResponse.json(
-      { error: "Referrals are temporarily disabled" },
-      { status: 503 }
-    );
-  }
   let body: unknown;
   try {
     body = await request.json();
@@ -55,9 +49,13 @@ export async function POST(request: Request) {
 
   const actionUrl = `${baseUrl}/api/actions/buy-keys?ref=${parsed.data.pubkey}`;
 
-  return NextResponse.json({
+  const response: Record<string, string> = {
     referralUrl: actionUrl,
-    blinkUrl: `https://dial.to/?action=solana-action:${actionUrl}`,
     referrer: parsed.data.pubkey,
-  });
+  };
+  if (REFERRALS_ENABLED) {
+    response.blinkUrl = `https://dial.to/?action=solana-action:${actionUrl}`;
+  }
+
+  return NextResponse.json(response);
 }
