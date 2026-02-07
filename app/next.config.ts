@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { getBlockchainId } from "./src/lib/network";
 
 const nextConfig: NextConfig = {
   serverExternalPackages: [
@@ -32,8 +33,8 @@ const nextConfig: NextConfig = {
             value: "Content-Type, Authorization, Accept-Encoding",
           },
           { key: "Access-Control-Expose-Headers", value: "X-Action-Version, X-Blockchain-Ids" },
-          { key: "X-Action-Version", value: "2.2" },
-          { key: "X-Blockchain-Ids", value: "solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1" },
+          { key: "X-Action-Version", value: "2.4" },
+          { key: "X-Blockchain-Ids", value: getBlockchainId() },
         ],
       },
       {

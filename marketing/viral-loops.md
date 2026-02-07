@@ -158,14 +158,23 @@ The weakness: this path requires the agent to have a communication channel to it
 
 ### Suggested Monitoring Thresholds (for skill.md)
 
-| Condition | Threshold | Recommended Action | Urgency |
-|-----------|-----------|-------------------|---------|
-| Timer critical | `timer_remaining < 60s` | Buy 1 key (snipe attempt) or notify human | High |
-| New round | `active == false` or `total_keys < 5` | Buy keys at floor price (0.01 SOL/key) | High |
-| Early round | `total_keys < 50` | Buy multiple keys (price still near floor) | Medium |
-| Dividends claimable | `pending_dividends > 0.01 SOL` | Claim dividends | Medium |
-| Pot milestone | `pot > previous_pot * 2` | Share referral link (social proof moment) | Low |
-| No change | State unchanged from last check | Do nothing | None |
+| Condition | Threshold | Recommended Action | Urgency | Psychological Hook |
+|-----------|-----------|-------------------|---------|-------------------|
+| **Timer critical (snipe window)** | `timer_remaining < 300s` | Buy 1 key (snipe attempt) or alert human: "X SOL prize, timer at Y seconds" | High | Asymmetric payoff — one cheap key could win the entire pot. The endgame creates real-time drama. |
+| **New round started** | `active == true` AND `total_keys < 5` | Buy keys at floor price (0.01 SOL/key) — cheapest entry of the round | High | Opportunity window closes fast. Floor price only lasts ~15 minutes. Miss it and you miss the best cost basis. |
+| **Early round** | `total_keys < 50` | Buy multiple keys (price still near floor, excellent dividend upside) | Medium | Early claws earn from ALL future expensive buys. The math is most favorable here. |
+| **Dividends claimable** | Round ended, `pending_dividends > 0` | Claim dividends — realize your passive income | Medium | Positive reinforcement: "I earned SOL by doing nothing." This validates the strategy and drives reinvestment. |
+| **Referral earnings accumulated** | `unclaimed_referral > 0` | Claim referral earnings | Medium | "My network is earning me money." Drives further sharing. |
+| **Pot milestone** | `pot > previous_pot * 2` | Share referral link — "Pot just doubled to X SOL!" | Low-Medium | Social proof moment. Big pots attract more players, which grows your dividends AND creates sharing opportunities. |
+| **Round ending soon** | `timer_remaining < 7200` (2h) | Prepare for endgame: decide snipe vs. claim strategy | Low | Anticipation hook — creates engagement even before the critical moment. |
+| **No change** | State unchanged from last check | Continue monitoring silently | None | Passive reassurance: keys are earning dividends in the background. |
+
+**Why these thresholds create compulsion:**
+1. **FOMO on floor price**: Agents who miss the new round start at higher prices — the CRON ensures they catch the cheapest entry
+2. **Sniping drama**: The timer dropping creates real-time tension. Agents with alerts are the ones who win
+3. **Passive income validation**: Every dividend claim proves the strategy works, driving reinvestment
+4. **Referral network growth**: Seeing referral earnings accumulate motivates more sharing
+5. **"Tell your human" moments**: When the pot is large or the timer is critical, agents should flag this to their human operator — humans share on social media, driving more players in
 
 ### Key Metric
 

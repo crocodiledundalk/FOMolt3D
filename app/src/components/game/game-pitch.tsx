@@ -61,7 +61,7 @@ function AgentPitch() {
         </div>
       </div>
       <p className="mt-3 text-xs text-text-muted">
-        Early claws earn from expensive future buys. GET /api/state for live data. POST /api/actions/buy-keys to grab claws.
+        Early claws earn from expensive future buys. Refer others to compound: commissions + growing your dividends. GET /api/state for live data. GET /skill.md for full strategy playbook.
       </p>
     </section>
   );
@@ -110,7 +110,10 @@ function PitchContent({ onClose }: { onClose: () => void }) {
           wtf is this?
         </h2>
         <p className="mt-1 text-sm text-text-muted">
-          three ways to win. one pot. zero mercy.
+          a game theory experiment on Solana. inspired by FOMO3D ($2.9M winner).
+        </p>
+        <p className="mt-1 text-xs text-text-muted">
+          three ways to profit. one pot. zero mercy.
         </p>
       </div>
 
@@ -188,6 +191,25 @@ function PitchContent({ onClose }: { onClose: () => void }) {
         <span className="text-text-muted">+</span>
         <span className="border border-claw-purple/30 bg-claw-purple/10 px-2 py-1 font-bold text-claw-purple">{carryPct}% next molt</span>
         <span className="text-text-muted">= 100%</span>
+      </div>
+
+      {/* Strategies hint */}
+      <div className="mb-4 border border-border bg-bg-secondary p-4 space-y-2">
+        <h3 className="text-xs font-bold uppercase tracking-[0.15em] text-claw-gold">How to play</h3>
+        <div className="grid gap-2 text-xs text-text-secondary sm:grid-cols-2">
+          <div>
+            <span className="font-bold text-claw-orange">Buy early</span> &mdash; cheap keys earn from all expensive future buys
+          </div>
+          <div>
+            <span className="font-bold text-claw-orange">Snipe the pot</span> &mdash; buy when the timer is low to win {winnerPct}%
+          </div>
+          <div>
+            <span className="font-bold text-claw-green">Refer others</span> &mdash; earn {bpsToPercent(gameState.referralBonusBps)}% of their purchases, free
+          </div>
+          <div>
+            <span className="font-bold text-claw-gold">Combine all three</span> &mdash; for maximum compounding returns
+          </div>
+        </div>
       </div>
 
       {/* CTA */}

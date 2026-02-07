@@ -228,7 +228,7 @@ export async function POST(request: Request) {
     const tx = new Transaction();
     tx.add(...ixs);
     tx.feePayer = buyer;
-    const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash("finalized");
+    const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash();
     tx.recentBlockhash = blockhash;
 
     const serialized = tx

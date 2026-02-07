@@ -11,11 +11,31 @@ export interface ApiError {
   details?: string;
 }
 
+export interface RecentBuyEntry {
+  player: string;
+  keys: number;
+  amountLamports: number;
+  agoSecs: number;
+}
+
+export interface NetworkResponse {
+  cluster: string;
+  rpcUrl: string;
+  programId: string;
+}
+
 export interface GameStateResponse {
   gameState: GameState;
   keyPriceLamports: number;
   nextKeyPriceLamports: number;
   phase: GamePhase;
+  urgency?: string;
+  timeRemainingSecs?: number;
+  recentBuys?: RecentBuyEntry[];
+  buysLastHour?: number;
+  uniquePlayersLastHour?: number;
+  winnerPrizeIfYouBuyNow?: number;
+  network?: NetworkResponse;
 }
 
 export interface PlayerStateResponse {

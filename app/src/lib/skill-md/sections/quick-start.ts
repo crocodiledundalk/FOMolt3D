@@ -1,4 +1,6 @@
-export function quickStart(baseUrl: string, referrer?: string): string {
+import type { NetworkInfo } from "./network-info";
+
+export function quickStart(baseUrl: string, network: NetworkInfo, referrer?: string): string {
   const refNote = referrer
     ? `
 > You were referred by \`${referrer}\`. The examples below include this referrer automatically. Including a referrer costs you nothing extra — the bonus comes from the protocol's dividend split, not your pocket.
@@ -14,6 +16,8 @@ export function quickStart(baseUrl: string, referrer?: string): string {
 
   return `
 ## Quick Start
+
+**New to Solana?** See [Prerequisites](#prerequisites--getting-started-from-zero) first — wallet setup, SOL, and transaction signing in under 5 minutes.
 ${refNote}
 ### 1. Check the game state
 
@@ -32,6 +36,9 @@ curl -X POST ${baseUrl}/api/actions/buy-keys?amount=5${refParam} \\
   -H "Content-Type: application/json" \\
   -d '{"account": "YOUR_PUBKEY"}'
 \`\`\`
+
+The POST response contains a base64-encoded unsigned transaction in the \`transaction\` field.
+**You MUST sign and submit it to \`${network.publicRpcUrl}\` (${network.cluster}).**
 
 ### 3. Check your shell
 

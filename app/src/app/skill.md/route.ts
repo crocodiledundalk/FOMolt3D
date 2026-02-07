@@ -13,6 +13,10 @@ import { calculateKeyPrice } from "@/lib/utils/bonding-curve";
 import { assembleSkillMd } from "@/lib/skill-md/template";
 import { trackReferralVisit } from "@/lib/referral-tracking";
 import { recordSnapshot } from "@/lib/state-history";
+import { getCachedEvents } from "@/lib/event-cache";
+import { getActivityMetrics } from "@/lib/activity-metrics";
+import { getCluster, getPublicRpcUrl, getProgramId } from "@/lib/network";
+import type { ActivityMetrics } from "@/lib/activity-metrics";
 import type { GameStateResponse, LeaderboardResponse } from "@/types/api";
 import type { LeaderboardEntry, ReferralEntry } from "@/types/game";
 
@@ -142,8 +146,20 @@ export async function GET(request: Request) {
       leaderboardData = { keyHolders, dividendEarners, topReferrers };
     }
 
+    // Compute activity metrics from cached events
+    const cachedEvents = getCachedEvents();
+    const activity: ActivityMetrics = getActivityMetrics(
+      cachedEvents,
+      state.gameState.totalPlayers
+    );
+
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
-    const markdown = assembleSkillMd(state, leaderboardData, baseUrl, referrer);
+    const network = {
+      cluster: getCluster(),
+      publicRpcUrl: getPublicRpcUrl(),
+      programId: getProgramId(),
+    };
+    const markdown = assembleSkillMd(state, leaderboardData, activity, baseUrl, network, referrer);
 
     return new Response(markdown, {
       headers: {

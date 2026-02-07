@@ -1,6 +1,14 @@
 import { describe, it, expect, vi } from "vitest";
 import { assembleSkillMd } from "./template";
 import type { GameStateResponse, LeaderboardResponse } from "@/types/api";
+import type { ActivityMetrics } from "@/lib/activity-metrics";
+import type { NetworkInfo } from "./sections/network-info";
+
+const mockNetwork: NetworkInfo = {
+  cluster: "devnet",
+  publicRpcUrl: "https://api.devnet.solana.com",
+  programId: "EebbWtjHyocWPwZaQ4k2L61mSdW6y175knsEwppTpdWw",
+};
 
 const mockState: GameStateResponse = {
   gameState: {
@@ -41,9 +49,20 @@ const mockLeaderboard: LeaderboardResponse = {
   topReferrers: [],
 };
 
+const mockActivity: ActivityMetrics = {
+  recentBuys: [
+    { player: "AgNt1xRvPfBh8K2yLqA9mDjE5nFoQw7zXcYb4UiT3pRs", keys: 5, amountLamports: 250_000_000, relativeTime: "2m ago", agoSecs: 120 },
+    { player: "BoT2kMnW9pQfLhJ7eSdR8xYv3nCgA6iUjKlZw5tH4bXs", keys: 10, amountLamports: 500_000_000, relativeTime: "7m ago", agoSecs: 420 },
+  ],
+  buysLastHour: 23,
+  uniquePlayersLastHour: 8,
+  timeSinceLastBuy: "2m ago",
+  totalPlayers: 15,
+};
+
 describe("assembleSkillMd", () => {
   it("produces valid markdown with all sections", () => {
-    const md = assembleSkillMd(mockState, mockLeaderboard, "http://localhost:3000");
+    const md = assembleSkillMd(mockState, mockLeaderboard, mockActivity, "http://localhost:3000", mockNetwork);
 
     // Should not contain undefined, null, or NaN
     expect(md).not.toContain("undefined");
@@ -54,7 +73,10 @@ describe("assembleSkillMd", () => {
     expect(md).toContain("FOMolt3D");
     expect(md).toContain("## wtf is this?");
     expect(md).toContain("## Three Ways to Win");
+    expect(md).toContain("## Prerequisites");
+    expect(md).toContain("## Network Configuration");
     expect(md).toContain("## Quick Start");
+    expect(md).toContain("## Strategy Playbook");
     expect(md).toContain("## API Reference");
     expect(md).toContain("## Monitoring");
     expect(md).toContain("## Income Opportunities");
@@ -65,7 +87,7 @@ describe("assembleSkillMd", () => {
   });
 
   it("hides blinkUrl when NEXT_PUBLIC_REFERRALS_ENABLED is not set", () => {
-    const md = assembleSkillMd(mockState, mockLeaderboard, "http://localhost:3000");
+    const md = assembleSkillMd(mockState, mockLeaderboard, mockActivity, "http://localhost:3000", mockNetwork);
 
     // Referral section should still appear
     expect(md).toContain("## Shell Link System");
@@ -78,7 +100,7 @@ describe("assembleSkillMd", () => {
     vi.stubEnv("NEXT_PUBLIC_REFERRALS_ENABLED", "true");
     vi.resetModules();
     const { assembleSkillMd: freshAssemble } = await import("./template");
-    const md = freshAssemble(mockState, mockLeaderboard, "http://localhost:3000");
+    const md = freshAssemble(mockState, mockLeaderboard, mockActivity, "http://localhost:3000", mockNetwork);
 
     expect(md).toContain("## Shell Link System");
     expect(md).toContain("dial.to");
@@ -88,13 +110,8 @@ describe("assembleSkillMd", () => {
     vi.resetModules();
   });
 
-  it("does not contain removed sections", () => {
-    const md = assembleSkillMd(mockState, mockLeaderboard, "http://localhost:3000");
-    expect(md).not.toContain("## Strategy Guide");
-  });
-
   it("includes live game data in pitch", () => {
-    const md = assembleSkillMd(mockState, mockLeaderboard, "http://localhost:3000");
+    const md = assembleSkillMd(mockState, mockLeaderboard, mockActivity, "http://localhost:3000", mockNetwork);
 
     // Should include pot value
     expect(md).toContain("42.50");
@@ -109,16 +126,85 @@ describe("assembleSkillMd", () => {
   });
 
   it("includes leaderboard entries with type badges", () => {
-    const md = assembleSkillMd(mockState, mockLeaderboard, "http://localhost:3000");
+    const md = assembleSkillMd(mockState, mockLeaderboard, mockActivity, "http://localhost:3000", mockNetwork);
     expect(md).toContain("AgNt");
     expect(md).toContain("85");
   });
 
   it("uses crustacean terminology", () => {
-    const md = assembleSkillMd(mockState, mockLeaderboard, "http://localhost:3000");
+    const md = assembleSkillMd(mockState, mockLeaderboard, mockActivity, "http://localhost:3000", mockNetwork);
     expect(md).toContain("King Claw");
     expect(md).toContain("claws");
     expect(md).toContain("scraps");
     expect(md).toContain("shell link");
+  });
+
+  it("includes network configuration for agents", () => {
+    const md = assembleSkillMd(mockState, mockLeaderboard, mockActivity, "http://localhost:3000", mockNetwork);
+    expect(md).toContain("## Network Configuration");
+    expect(md).toContain("devnet");
+    expect(md).toContain("https://api.devnet.solana.com");
+    expect(md).toContain("EebbWtjHyocWPwZaQ4k2L61mSdW6y175knsEwppTpdWw");
+    expect(md).toContain("MUST send them to the RPC URL");
+    expect(md).toContain("Solana DEVNET");
+  });
+
+  it("includes network info in frontmatter YAML", () => {
+    const md = assembleSkillMd(mockState, mockLeaderboard, mockActivity, "http://localhost:3000", mockNetwork);
+    expect(md).toContain("cluster: devnet");
+    expect(md).toContain("rpc_url: https://api.devnet.solana.com");
+    expect(md).toContain("program_id: EebbWtjHyocWPwZaQ4k2L61mSdW6y175knsEwppTpdWw");
+  });
+
+  it("tells agents to submit transactions to the correct RPC", () => {
+    const md = assembleSkillMd(mockState, mockLeaderboard, mockActivity, "http://localhost:3000", mockNetwork);
+    expect(md).toContain("submit it to `https://api.devnet.solana.com` (devnet)");
+  });
+
+  it("includes prerequisites section with wallet setup", () => {
+    const md = assembleSkillMd(mockState, mockLeaderboard, mockActivity, "http://localhost:3000", mockNetwork);
+    expect(md).toContain("## Prerequisites");
+    expect(md).toContain("Solana Keypair");
+    expect(md).toContain("solana-keygen");
+    expect(md).toContain("Sign and Submit");
+    expect(md).toContain("base64");
+  });
+
+  it("includes strategy playbook with four strategies", () => {
+    const md = assembleSkillMd(mockState, mockLeaderboard, mockActivity, "http://localhost:3000", mockNetwork);
+    expect(md).toContain("## Strategy Playbook");
+    expect(md).toContain("Strategy 1: The Accumulator");
+    expect(md).toContain("Strategy 2: The Sniper");
+    expect(md).toContain("Strategy 3: The Referral Farmer");
+    expect(md).toContain("Strategy 4: The Hybrid");
+    expect(md).toContain("Tell Your Human");
+  });
+
+  it("includes FOMO3D heritage in what-is-this", () => {
+    const md = assembleSkillMd(mockState, mockLeaderboard, mockActivity, "http://localhost:3000", mockNetwork);
+    expect(md).toContain("FOMO3D");
+    expect(md).toContain("$2.9 million");
+  });
+
+  it("includes monitoring with sniping and CRON guidance", () => {
+    const md = assembleSkillMd(mockState, mockLeaderboard, mockActivity, "http://localhost:3000", mockNetwork);
+    expect(md).toContain("Sniper Alert");
+    expect(md).toContain("Autonomous Play");
+    expect(md).toContain("Referral Earnings Tracker");
+    expect(md).toContain("Why Keep Coming Back");
+  });
+
+  it("includes compelling referral motivation", () => {
+    const md = assembleSkillMd(mockState, mockLeaderboard, mockActivity, "http://localhost:3000", mockNetwork);
+    expect(md).toContain("Why refer?");
+    expect(md).toContain("Free money");
+    expect(md).toContain("Compounds with your position");
+    expect(md).toContain("Track your earnings");
+  });
+
+  it("includes devnet SOL faucet instructions in prerequisites", () => {
+    const md = assembleSkillMd(mockState, mockLeaderboard, mockActivity, "http://localhost:3000", mockNetwork);
+    expect(md).toContain("solana airdrop");
+    expect(md).toContain("free on devnet");
   });
 });

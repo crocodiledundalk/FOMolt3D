@@ -24,6 +24,7 @@ export function apiReference(baseUrl: string): string {
 | POST | \`${baseUrl}/api/actions/claim-referral-earnings\` | Build referral claim transaction |
 
 All POST endpoints accept \`{"account": "YOUR_PUBKEY"}\` and return a serialized unsigned transaction.
+Sign the transaction and submit it to the RPC URL specified in the Network Configuration section above.
 
 **Notes:**
 - \`buy-keys\`: If \`?amount\` is omitted, defaults to 1 claw. Max 10,000 claws per transaction.
