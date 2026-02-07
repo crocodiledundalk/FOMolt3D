@@ -12,7 +12,7 @@ import {
   fetchVaultBalance,
 } from "@/lib/sdk/accounts";
 import { getConfigPDA, getGameStatePDA, getPlayerStatePDA, getVaultPDA } from "@/lib/sdk/pdas";
-import { formatSol, formatAddress, formatTimestamp } from "@/lib/utils/format";
+import { formatSol, formatTimestamp } from "@/lib/utils/format";
 import { toast } from "sonner";
 
 interface AccountsPanelProps {

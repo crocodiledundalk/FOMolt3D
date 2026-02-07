@@ -110,6 +110,15 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
   type __Unused = __Check
 }
 
+// Validate ../../src/app/api/actions/buy-keys/callback/route.ts
+{
+  type __IsExpected<Specific extends RouteHandlerConfig<"/api/actions/buy-keys/callback">> = Specific
+  const handler = {} as typeof import("../../src/app/api/actions/buy-keys/callback/route.js")
+  type __Check = __IsExpected<typeof handler>
+  // @ts-ignore
+  type __Unused = __Check
+}
+
 // Validate ../../src/app/api/actions/buy-keys/route.ts
 {
   type __IsExpected<Specific extends RouteHandlerConfig<"/api/actions/buy-keys">> = Specific
@@ -168,6 +177,15 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
 {
   type __IsExpected<Specific extends RouteHandlerConfig<"/api/leaderboard">> = Specific
   const handler = {} as typeof import("../../src/app/api/leaderboard/route.js")
+  type __Check = __IsExpected<typeof handler>
+  // @ts-ignore
+  type __Unused = __Check
+}
+
+// Validate ../../src/app/api/og/game/route.tsx
+{
+  type __IsExpected<Specific extends RouteHandlerConfig<"/api/og/game">> = Specific
+  const handler = {} as typeof import("../../src/app/api/og/game/route.js")
   type __Check = __IsExpected<typeof handler>
   // @ts-ignore
   type __Unused = __Check

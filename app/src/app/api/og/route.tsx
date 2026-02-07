@@ -1,10 +1,10 @@
 import { ImageResponse } from "next/og";
 import {
   getReadOnlyProgram,
-  findCurrentRound,
   getNextKeyPrice,
   getGamePhase,
 } from "@/lib/sdk";
+import { getCachedGameRound } from "@/lib/rpc-cache";
 import { formatTime } from "@/lib/utils/format";
 
 export const runtime = "edge";
@@ -12,7 +12,7 @@ export const runtime = "edge";
 export async function GET() {
   try {
     const program = getReadOnlyProgram();
-    const result = await findCurrentRound(program);
+    const result = await getCachedGameRound(program);
 
     let potSol = "0";
     let timerText = "Not started";

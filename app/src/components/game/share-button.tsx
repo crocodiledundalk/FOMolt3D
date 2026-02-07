@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useWallet } from "@solana/wallet-adapter-react";
 import { useGameState } from "@/hooks/use-game-state";
 import { formatSol } from "@/lib/utils/format";
 
@@ -10,6 +11,7 @@ interface ShareButtonProps {
 }
 
 export function ShareButton({ variant = "compact", className = "" }: ShareButtonProps) {
+  const { publicKey } = useWallet();
   const { data: gameData } = useGameState();
   const [origin, setOrigin] = useState("");
 
@@ -19,7 +21,8 @@ export function ShareButton({ variant = "compact", className = "" }: ShareButton
 
   if (!origin) return null;
 
-  const blinkUrl = `https://dial.to/?action=solana-action:${origin}/api/actions/buy-keys`;
+  const walletRef = publicKey ? `?ref=${publicKey.toBase58()}` : "";
+  const blinkUrl = `https://dial.to/?action=solana-action:${origin}/api/actions/buy-keys${walletRef}`;
 
   const potText = gameData
     ? `${formatSol(gameData.gameState.potLamports, 2)} SOL`

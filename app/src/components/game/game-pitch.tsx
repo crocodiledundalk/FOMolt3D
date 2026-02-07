@@ -6,6 +6,7 @@ import { useMode } from "@/providers/mode-provider";
 import { useFocusTrap } from "@/hooks/use-focus-trap";
 import { formatSol } from "@/lib/utils/format";
 import { bpsToPercent } from "@/lib/constants/game";
+import { Emoji } from "@/components/ui/emoji";
 
 const SEEN_KEY = "fomolt3d-pitch-seen";
 
@@ -31,7 +32,7 @@ function AgentPitch() {
   return (
     <section className="border-2 border-dashed border-border bg-bg-secondary p-4">
       <h2 className="mb-3 text-sm font-bold uppercase tracking-[0.2em] text-claw-cyan">
-        &#x1F99E; Value Proposition
+        <Emoji label="claw">&#x1F99E;</Emoji> Value Proposition
       </h2>
       <div className="grid gap-3 text-sm sm:grid-cols-3">
         <div className="border border-border bg-bg-primary p-3">
@@ -104,7 +105,7 @@ function PitchContent({ onClose }: { onClose: () => void }) {
 
       {/* Header */}
       <div className="mb-6 text-center">
-        <span className="text-4xl pitch-lobster-entrance">&#x1F99E;</span>
+        <span className="text-4xl pitch-lobster-entrance"><Emoji label="claw">&#x1F99E;</Emoji></span>
         <h2 id="pitch-dialog-title" className="mt-2 text-2xl font-bold text-claw-orange md:text-3xl">
           wtf is this?
         </h2>
@@ -121,7 +122,7 @@ function PitchContent({ onClose }: { onClose: () => void }) {
         </p>
         <span className="text-lg text-text-secondary">SOL</span>
         <p className="mt-2 text-sm text-claw-gold">
-          &#x1F451; King Claw takes <span className="font-bold">{prizeSol} SOL</span>
+          <Emoji label="crown">&#x1F451;</Emoji> King Claw takes <span className="font-bold">{prizeSol} SOL</span>
         </p>
       </div>
 
@@ -129,7 +130,7 @@ function PitchContent({ onClose }: { onClose: () => void }) {
       <div className="mb-6 grid gap-3 sm:grid-cols-3">
         {/* Jackpot */}
         <div className="pitch-card-entrance border-2 border-dashed border-claw-orange/30 bg-bg-secondary p-4 text-center" style={{ animationDelay: "0.1s" }}>
-          <span className="text-3xl">&#x1F451;&#x1F99E;</span>
+          <span className="text-3xl"><Emoji label="king claw">&#x1F451;&#x1F99E;</Emoji></span>
           <h3 className="mt-2 text-sm font-bold text-claw-orange">The Jackpot</h3>
           <p className="tabular-nums text-3xl font-bold text-claw-gold">{winnerPct}%</p>
           <p className="text-xs text-text-muted">of the entire pot</p>
@@ -145,7 +146,7 @@ function PitchContent({ onClose }: { onClose: () => void }) {
 
         {/* Passive Scraps */}
         <div className="pitch-card-entrance border-2 border-dashed border-claw-green/30 bg-bg-secondary p-4 text-center" style={{ animationDelay: "0.2s" }}>
-          <span className="text-3xl">&#x1F980;</span>
+          <span className="text-3xl"><Emoji label="crab">&#x1F980;</Emoji></span>
           <h3 className="mt-2 text-sm font-bold text-claw-green">Passive Scraps</h3>
           <p className="tabular-nums text-3xl font-bold text-claw-green">{dividendPct}%</p>
           <p className="text-xs text-text-muted">of every future grab</p>
@@ -164,7 +165,7 @@ function PitchContent({ onClose }: { onClose: () => void }) {
 
         {/* The Clock */}
         <div className="pitch-card-entrance border-2 border-dashed border-claw-purple/30 bg-bg-secondary p-4 text-center" style={{ animationDelay: "0.3s" }}>
-          <span className="text-3xl">&#x23F0;</span>
+          <span className="text-3xl"><Emoji label="alarm clock">&#x23F0;</Emoji></span>
           <h3 className="mt-2 text-sm font-bold text-claw-purple">The Clock</h3>
           <p className="tabular-nums text-3xl font-bold text-text-primary">+{gameState.timerExtensionSecs}s</p>
           <p className="text-xs text-text-muted">per grab, max {gameState.maxTimerSecs / 3600}h</p>
@@ -194,7 +195,7 @@ function PitchContent({ onClose }: { onClose: () => void }) {
         onClick={onClose}
         className="w-full border-2 border-claw-orange/40 bg-claw-orange/10 px-6 py-3 text-sm font-bold uppercase tracking-[0.2em] text-claw-orange transition-all hover:bg-claw-orange/20 hover:border-claw-orange"
       >
-        &#x1F99E; I&apos;m in. show me the game.
+        <Emoji label="claw">&#x1F99E;</Emoji> I&apos;m in. show me the game.
       </button>
     </div>
   );
@@ -262,7 +263,7 @@ export function PitchTrigger({ onClick }: { onClick: () => void }) {
       onClick={onClick}
       className="group flex items-center gap-2 border-2 border-dashed border-claw-orange/30 bg-bg-secondary px-4 py-2.5 text-sm transition-all hover:border-claw-orange hover:bg-claw-orange/5"
     >
-      <span className="text-lg transition-transform group-hover:scale-110">&#x1F99E;</span>
+      <span className="text-lg transition-transform group-hover:scale-110"><Emoji label="claw">&#x1F99E;</Emoji></span>
       <span className="font-bold uppercase tracking-[0.15em] text-claw-orange">wtf is this?</span>
     </button>
   );

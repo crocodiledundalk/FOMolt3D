@@ -3,12 +3,12 @@ import { PublicKey, Transaction } from "@solana/web3.js";
 import {
   getReadOnlyProgram,
   getConnection,
-  findCurrentRound,
   fetchPlayerState,
   buildSmartBuy,
   getGamePhase,
   estimateBuyCost,
 } from "@/lib/sdk";
+import { getCachedGameRound } from "@/lib/rpc-cache";
 
 export async function POST(request: Request) {
   try {
@@ -35,7 +35,7 @@ export async function POST(request: Request) {
     const connection = getConnection();
     const program = getReadOnlyProgram(connection);
 
-    const result = await findCurrentRound(program);
+    const result = await getCachedGameRound(program);
     if (!result) {
       return NextResponse.json(
         { error: "No active round found" },

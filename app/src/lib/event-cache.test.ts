@@ -1,7 +1,6 @@
 // @vitest-environment node
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import fs from "node:fs";
-import path from "node:path";
 import type { FomoltEvent } from "./sdk/events";
 
 // Mock fs and fetchRecentEvents before importing the module

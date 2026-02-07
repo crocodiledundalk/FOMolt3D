@@ -9,10 +9,10 @@ import { usePlayerState } from "@/hooks/use-player-state";
 import { useAnchorProgram } from "@/hooks/use-anchor-program";
 import { useMode } from "@/providers/mode-provider";
 import { WalletConnect } from "@/components/wallet/wallet-connect";
-import { findCurrentRound } from "@/lib/sdk/accounts";
 import { buildClaimReferralEarnings } from "@/lib/sdk/instructions";
 import { parseProgramError } from "@/lib/sdk/errors";
 import { formatSol } from "@/lib/utils/format";
+import { Emoji } from "@/components/ui/emoji";
 import { toast } from "sonner";
 
 export function ReferralCTA() {
@@ -41,15 +41,16 @@ export function ReferralCTA() {
     if (!publicKey || !anchor) return;
     setClaimingReferral(true);
     try {
-      const roundResult = await findCurrentRound(anchor.program);
-      if (!roundResult) {
+      // Use round number from cached API state (no round scanning needed)
+      const round = gameData?.gameState.round;
+      if (!round) {
         toast.error("No round found");
         return;
       }
       const ix = await buildClaimReferralEarnings(
         anchor.program,
         publicKey,
-        roundResult.gameState.round
+        round
       );
       const tx = new Transaction().add(ix);
       tx.feePayer = publicKey;
@@ -71,9 +72,9 @@ export function ReferralCTA() {
     } finally {
       setClaimingReferral(false);
     }
-  }, [publicKey, anchor, connection, sendTransaction, queryClient]);
+  }, [publicKey, anchor, gameData, connection, sendTransaction, queryClient]);
 
-  const referralUrl = address && origin ? `${origin}?ref=${address}` : null;
+  const referralUrl = address && origin ? `${origin}/api/actions/buy-keys?ref=${address}` : null;
 
   const copyLink = () => {
     if (!referralUrl) return;
@@ -88,7 +89,7 @@ export function ReferralCTA() {
         <div className="flex items-start justify-between gap-4">
           <div>
             <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-claw-cyan">
-              &#x1F517; Referrals &mdash; Earn {referralPct}% Per Referral
+              <Emoji label="link">&#x1F517;</Emoji> Referrals &mdash; Earn {referralPct}% Per Referral
             </h3>
             <p className="mt-1 text-xs text-text-muted">
               Earn {referralPct}% of every transaction by referred agents or humans.
@@ -115,7 +116,7 @@ export function ReferralCTA() {
     return (
       <section className="border-2 border-claw-green/30 bg-bg-secondary p-5">
         <div className="flex flex-col items-center gap-3 text-center">
-          <span className="text-3xl">&#x1F517;&#x1F99E;</span>
+          <span className="text-3xl"><Emoji label="referral claw">&#x1F517;&#x1F99E;</Emoji></span>
           <h3 className="text-lg font-bold text-claw-green">
             Earn {referralPct}% on Every Referred Grab
           </h3>
@@ -151,7 +152,7 @@ export function ReferralCTA() {
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h3 className="flex items-center gap-2 text-sm font-bold uppercase tracking-[0.2em] text-claw-green">
-            <span className="text-lg">&#x1F517;</span>
+            <span className="text-lg"><Emoji label="link">&#x1F517;</Emoji></span>
             Your Referrals
           </h3>
           {referralUrl && (
@@ -211,7 +212,7 @@ function ReferralOpportunity({ referralPct }: { referralPct: number }) {
   return (
     <section className="border-2 border-claw-green/30 bg-bg-secondary p-5">
       <div className="flex flex-col items-center gap-3 text-center">
-        <span className="text-3xl">&#x1F517;&#x1F99E;</span>
+        <span className="text-3xl"><Emoji label="referral claw">&#x1F517;&#x1F99E;</Emoji></span>
         <h3 className="text-lg font-bold text-claw-green">
           Earn {referralPct}% on Every Referred Transaction
         </h3>

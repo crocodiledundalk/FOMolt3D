@@ -7,7 +7,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useGameState } from "@/hooks/use-game-state";
 import { usePlayerState } from "@/hooks/use-player-state";
 import { useAnchorProgram } from "@/hooks/use-anchor-program";
-import { findCurrentRound, fetchPlayerState } from "@/lib/sdk/accounts";
+import { fetchGameState, fetchPlayerState } from "@/lib/sdk/accounts";
 import { buildSmartClaim } from "@/lib/sdk/composites";
 import { formatSol } from "@/lib/utils/format";
 import { parseProgramError } from "@/lib/sdk/errors";
@@ -42,11 +42,18 @@ export function ClaimPanel() {
     if (!publicKey || !anchor) return;
     setClaiming(true);
     try {
-      const roundResult = await findCurrentRound(anchor.program);
-      if (!roundResult) {
+      // Use round number from cached API state, fetch fresh on-chain data (1 RPC call)
+      const round = gameData?.gameState.round;
+      if (!round) {
         toast.error("No round found");
         return;
       }
+      const gameState = await fetchGameState(anchor.program, round);
+      if (!gameState) {
+        toast.error("Failed to fetch round state");
+        return;
+      }
+      const roundResult = { round, gameState };
 
       const onChainPlayerState = await fetchPlayerState(anchor.program, publicKey);
       const ixs = await buildSmartClaim(
@@ -88,7 +95,7 @@ export function ClaimPanel() {
     } finally {
       setClaiming(false);
     }
-  }, [publicKey, anchor, connection, sendTransaction, queryClient]);
+  }, [publicKey, anchor, gameData, connection, sendTransaction, queryClient]);
 
   // Don't render if wallet not connected or nothing to claim
   if (!publicKey || !playerData || !gameData) return null;

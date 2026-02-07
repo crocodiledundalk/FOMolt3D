@@ -8,10 +8,11 @@ import type { Program } from "@coral-xyz/anchor";
 import type { Fomolt3d } from "@/lib/idl-types";
 import type { OnChainGameState } from "@/lib/sdk/types";
 import {
-  findCurrentRound,
   fetchGameState,
   fetchVaultBalance,
 } from "@/lib/sdk/accounts";
+import { API_ROUTES } from "@/lib/constants/routes";
+import type { GameStateResponse } from "@/types/api";
 import {
   buildInitializeFirstRound,
   buildStartNewRound,
@@ -29,14 +30,26 @@ export function RoundPanel({ program }: RoundPanelProps) {
   const queryClient = useQueryClient();
   const [submitting, setSubmitting] = useState(false);
 
-  const { data: currentRoundData, isLoading } = useQuery({
+  // Fetch current round from API (uses server-side cache, hides private RPC)
+  const { data: apiState, isLoading } = useQuery<GameStateResponse>({
     queryKey: ["adminCurrentRound"],
-    queryFn: () => findCurrentRound(program),
+    queryFn: async () => {
+      const res = await fetch(API_ROUTES.STATE);
+      if (!res.ok) return null;
+      return res.json();
+    },
     refetchInterval: 5_000,
   });
 
-  const round = currentRoundData?.round ?? null;
-  const gameState = currentRoundData?.gameState ?? null;
+  const round = apiState?.gameState.round ?? null;
+
+  // Fetch full on-chain GameState for detailed admin fields (uses wallet's public RPC)
+  const { data: gameState } = useQuery({
+    queryKey: ["adminGameState", round],
+    queryFn: () => fetchGameState(program, round!),
+    enabled: round !== null,
+    refetchInterval: 5_000,
+  });
 
   const { data: vaultBalance } = useQuery({
     queryKey: ["adminVaultBalance", round],

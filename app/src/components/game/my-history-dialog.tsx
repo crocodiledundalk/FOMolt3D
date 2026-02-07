@@ -23,6 +23,23 @@ function HistoryContent({ onClose }: { onClose: () => void }) {
   const { data: playerData } = usePlayerState(address);
   const { events: allEvents } = useGameEvents();
 
+  const player = playerData?.playerState;
+  const status = playerData?.status;
+  const gameState = gameData?.gameState;
+
+  // All hooks must be called before any early return
+  const myEvents = useMemo(
+    () => allEvents.filter((e) => e.player === address),
+    [allEvents, address]
+  );
+
+  const potSharePct = useMemo(() =>
+    gameState && gameState.totalKeys > 0 && player
+      ? ((player.keys / gameState.totalKeys) * 100).toFixed(2)
+      : "0.00",
+    [player, gameState]
+  );
+
   if (!publicKey || !address) {
     return (
       <div className="pitch-dialog-content relative max-h-[85vh] w-[95vw] max-w-xl overflow-y-auto border-2 border-border bg-bg-primary p-6">
@@ -40,27 +57,10 @@ function HistoryContent({ onClose }: { onClose: () => void }) {
     );
   }
 
-  const player = playerData?.playerState;
-  const status = playerData?.status;
-  const gameState = gameData?.gameState;
-
-  // Filter SSE events for this player
-  const myEvents = useMemo(
-    () => allEvents.filter((e) => e.player === address),
-    [allEvents, address]
-  );
-
   const estimatedDividend = status?.estimatedDividend ?? 0;
   const unclaimedReferral = player
     ? player.referralEarningsLamports - player.claimedReferralEarningsLamports
     : 0;
-
-  const potSharePct = useMemo(() =>
-    gameState && gameState.totalKeys > 0 && player
-      ? ((player.keys / gameState.totalKeys) * 100).toFixed(2)
-      : "0.00",
-    [player?.keys, gameState?.totalKeys]
-  );
 
   return (
     <div className="pitch-dialog-content relative max-h-[85vh] w-[95vw] max-w-xl overflow-y-auto border-2 border-border bg-bg-primary p-6">

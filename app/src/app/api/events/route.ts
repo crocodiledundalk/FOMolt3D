@@ -5,6 +5,10 @@ import {
   appendLiveEvent,
   getCachedEvents,
 } from "@/lib/event-cache";
+import {
+  invalidateGameRoundCache,
+  invalidateLeaderboardCache,
+} from "@/lib/rpc-cache";
 
 export const dynamic = "force-dynamic";
 
@@ -63,6 +67,15 @@ export async function GET() {
       unsubscribe = subscribeToGameEvents(connection, (event: FomoltEvent) => {
         appendLiveEvent(event);
         enqueueRawEvent(controller, encoder, event, "evt");
+
+        // Invalidate RPC caches when game state changes
+        if (event.type === "RoundStarted" || event.type === "RoundConcluded") {
+          invalidateGameRoundCache();
+          invalidateLeaderboardCache();
+        } else if (event.type === "KeysPurchased") {
+          invalidateGameRoundCache();
+          invalidateLeaderboardCache();
+        }
       });
 
       // Backfill from cache (incremental fetch — only new txs since last cached sig)

@@ -1,12 +1,14 @@
 import {
   getReadOnlyProgram,
-  findCurrentRound,
-  fetchAllPlayersInRound,
   getGamePhase,
   getNextKeyPrice,
   estimateDividend,
   toApiGameState,
 } from "@/lib/sdk";
+import {
+  getCachedGameRound,
+  getCachedLeaderboardPlayers,
+} from "@/lib/rpc-cache";
 import { calculateKeyPrice } from "@/lib/utils/bonding-curve";
 import { assembleSkillMd } from "@/lib/skill-md/template";
 import { trackReferralVisit } from "@/lib/referral-tracking";
@@ -17,7 +19,7 @@ import type { LeaderboardEntry, ReferralEntry } from "@/types/game";
 export async function GET(request: Request) {
   try {
     const program = getReadOnlyProgram();
-    const result = await findCurrentRound(program);
+    const result = await getCachedGameRound(program);
 
     // Extract ?ref= query param for referral embedding
     const url = new URL(request.url);
@@ -81,7 +83,7 @@ export async function GET(request: Request) {
       recordSnapshot(gs.totalKeys, gs.potLamports, keyPriceLamports);
 
       // Build leaderboard for skill.md
-      const players = await fetchAllPlayersInRound(program, round);
+      const players = await getCachedLeaderboardPlayers(program, round);
 
       // Key holders: sorted by keys
       const keyHolders: LeaderboardEntry[] = players

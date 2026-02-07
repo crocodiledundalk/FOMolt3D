@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { API_ROUTES } from "@/lib/constants/routes";
 import { formatSol, formatAddress } from "@/lib/utils/format";
+import { Emoji } from "@/components/ui/emoji";
 import { PlayerTypeBadge } from "./strategy-tag";
 import { PAGE_ROUTES } from "@/lib/constants/routes";
 import Link from "next/link";
@@ -64,7 +65,7 @@ function KingClawHighlight() {
         kingFlash ? "animate-king-claw-flash" : ""
       }`}
     >
-      <span className="text-lg">&#x1F451;</span>
+      <span className="text-lg"><Emoji label="crown">&#x1F451;</Emoji></span>
       <span className="text-xs font-bold uppercase tracking-[0.15em] text-claw-gold">
         King Claw
       </span>

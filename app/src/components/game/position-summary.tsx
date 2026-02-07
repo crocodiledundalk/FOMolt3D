@@ -15,6 +15,24 @@ export function PositionSummary({ onOpenHistory }: { onOpenHistory: () => void }
   const { data: gameData } = useGameState();
   const { data: playerData } = usePlayerState(address);
 
+  const player = playerData?.playerState ?? null;
+  const gameState = gameData?.gameState ?? null;
+
+  // All hooks must be called before any early return
+  const potSharePct = useMemo(() =>
+    gameState && gameState.totalKeys > 0 && player
+      ? ((player.keys / gameState.totalKeys) * 100).toFixed(2)
+      : "0.00",
+    [player?.keys, gameState?.totalKeys]
+  );
+
+  const potShareSol = useMemo(() =>
+    gameState && gameState.totalKeys > 0 && player
+      ? formatSol(Math.floor((player.keys / gameState.totalKeys) * gameState.totalDividendPool))
+      : "0",
+    [player?.keys, gameState?.totalKeys, gameState?.totalDividendPool]
+  );
+
   // Agent mode: compact API reference
   if (isAgent) {
     return (
@@ -39,27 +57,10 @@ export function PositionSummary({ onOpenHistory }: { onOpenHistory: () => void }
     );
   }
 
-  const player = playerData.playerState;
-
   // Player hasn't joined the round yet
   if (!player) {
     return null;
   }
-  const { gameState } = gameData;
-
-  const potSharePct = useMemo(() =>
-    gameState.totalKeys > 0
-      ? ((player.keys / gameState.totalKeys) * 100).toFixed(2)
-      : "0.00",
-    [player.keys, gameState.totalKeys]
-  );
-
-  const potShareSol = useMemo(() =>
-    gameState.totalKeys > 0
-      ? formatSol(Math.floor((player.keys / gameState.totalKeys) * gameState.totalDividendPool))
-      : "0",
-    [player.keys, gameState.totalKeys, gameState.totalDividendPool]
-  );
 
   return (
     <div className="flex flex-wrap items-center gap-x-5 gap-y-2 border-2 border-dashed border-border bg-bg-secondary px-4 py-3">

@@ -7,7 +7,6 @@ import {
   getConnection,
   fetchPlayerState,
   getGamePhase,
-  getPlayerStatus,
   buildClaim,
   isValidSolanaAddress,
 } from "@/lib/sdk";
@@ -123,7 +122,7 @@ export async function POST(request: Request) {
     const connection = getConnection();
     const program = getReadOnlyProgram(connection);
 
-    const result = await findCurrentRound(program);
+    const result = await getCachedGameRound(program);
     if (!result) {
       return NextResponse.json(
         { error: "No round found" },

@@ -4,9 +4,9 @@ import { PublicKey } from "@solana/web3.js";
 import {
   getReadOnlyProgram,
   fetchPlayerState,
-  findCurrentRound,
   getPlayerStatus,
 } from "@/lib/sdk";
+import { getCachedGameRound } from "@/lib/rpc-cache";
 import { formatSol, formatAddress } from "@/lib/utils/format";
 import { pubkeySchema } from "@/lib/validations/game";
 
@@ -23,7 +23,7 @@ export default async function AgentPage({
   const playerPubkey = new PublicKey(parsed.data);
   const [playerState, roundResult] = await Promise.all([
     fetchPlayerState(program, playerPubkey),
-    findCurrentRound(program),
+    getCachedGameRound(program),
   ]);
 
   const gameState = roundResult?.gameState ?? null;

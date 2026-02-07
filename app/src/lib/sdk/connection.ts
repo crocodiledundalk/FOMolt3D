@@ -4,8 +4,10 @@ import type { Fomolt3d } from "../idl-types";
 import idl from "../idl.json";
 import { PROGRAM_ID } from "./pdas";
 
+// Server-only RPC_URL (not bundled into client JS) takes priority,
+// then public NEXT_PUBLIC_RPC_URL for client-side, then devnet fallback.
 const DEFAULT_RPC_URL =
-  process.env.NEXT_PUBLIC_RPC_URL || clusterApiUrl("devnet");
+  process.env.RPC_URL || process.env.NEXT_PUBLIC_RPC_URL || clusterApiUrl("devnet");
 
 const DEFAULT_COMMITMENT = "confirmed" as const;
 

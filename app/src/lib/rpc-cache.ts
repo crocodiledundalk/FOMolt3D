@@ -17,8 +17,8 @@ interface CacheEntry<T> {
 
 // ─── Configuration ──────────────────────────────────────────────────
 
-const GAME_ROUND_TTL_MS = 5_000; // 5 seconds
-const LEADERBOARD_TTL_MS = 15_000; // 15 seconds
+const GAME_ROUND_TTL_MS = 3_000; // 3 seconds — only skip fetch if incredibly fresh
+const LEADERBOARD_TTL_MS = 3_000; // 3 seconds — same threshold
 
 // ─── State ──────────────────────────────────────────────────────────
 
@@ -107,21 +107,27 @@ export async function getCachedLeaderboardPlayers(
  * Invalidate the game round cache.
  * Call this when a RoundStarted or RoundConcluded event is received
  * so the next request fetches fresh data.
+ * Keeps stale data for fallback if RPC fails.
  */
 export function invalidateGameRoundCache(): void {
-  gameRoundCache = null;
+  if (gameRoundCache) {
+    gameRoundCache.fetchedAt = 0;
+  }
 }
 
 /**
  * Invalidate the leaderboard cache.
  * Call this when a KeysPurchased event is received (new player/keys change).
+ * Keeps stale data for fallback if RPC fails.
  */
 export function invalidateLeaderboardCache(): void {
-  leaderboardCache = null;
+  if (leaderboardCache) {
+    leaderboardCache.fetchedAt = 0;
+  }
 }
 
 /**
- * Invalidate all caches. Useful for testing.
+ * Invalidate all caches and clear stale data. Used for testing.
  */
 export function invalidateAllCaches(): void {
   gameRoundCache = null;

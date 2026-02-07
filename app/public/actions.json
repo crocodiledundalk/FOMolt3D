@@ -1,20 +1,8 @@
 {
   "rules": [
-    {
-      "pathPattern": "/api/actions/buy-keys",
-      "apiPath": "/api/actions/buy-keys"
-    },
-    {
-      "pathPattern": "/api/actions/claim-dividends",
-      "apiPath": "/api/actions/claim-dividends"
-    },
-    {
-      "pathPattern": "/api/actions/claim-winner",
-      "apiPath": "/api/actions/claim-winner"
-    },
-    {
-      "pathPattern": "/api/actions/claim-referral-earnings",
-      "apiPath": "/api/actions/claim-referral-earnings"
-    }
+    { "pathPattern": "/api/actions/buy-keys**", "apiPath": "/api/actions/buy-keys**" },
+    { "pathPattern": "/api/actions/claim-dividends**", "apiPath": "/api/actions/claim-dividends**" },
+    { "pathPattern": "/api/actions/claim-winner**", "apiPath": "/api/actions/claim-winner**" },
+    { "pathPattern": "/api/actions/claim-referral-earnings**", "apiPath": "/api/actions/claim-referral-earnings**" }
   ]
 }

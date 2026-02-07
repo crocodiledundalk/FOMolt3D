@@ -1,6 +1,5 @@
 import { Connection, PublicKey } from "@solana/web3.js";
 import { BorshCoder, EventParser } from "@coral-xyz/anchor";
-import type { Fomolt3d } from "../idl-types";
 import idl from "../idl.json";
 import { PROGRAM_ID } from "./pdas";
 

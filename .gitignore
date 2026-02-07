@@ -17,12 +17,14 @@ test-ledger/
 Thumbs.db
 
 # Event cache
-.cache/
+*/.cache/
 
 # Environment
-.env
-.env.local
-.env.*.local
+*/.env
+*/.env.local
+*/.env.*.local
+
+app/.next/
 
 # Keys (never commit)
 *.json.bak

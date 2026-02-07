@@ -2,11 +2,11 @@ import { NextResponse } from "next/server";
 import { PublicKey } from "@solana/web3.js";
 import {
   getReadOnlyProgram,
-  findCurrentRound,
   fetchPlayerState,
   getPlayerStatus,
   toApiPlayerState,
 } from "@/lib/sdk";
+import { getCachedGameRound } from "@/lib/rpc-cache";
 import { pubkeySchema } from "@/lib/validations/game";
 import type { PlayerStateResponse } from "@/types/api";
 import type { PlayerStatus } from "@/types/game";
@@ -31,7 +31,7 @@ export async function GET(
 
     const [ps, roundResult] = await Promise.all([
       fetchPlayerState(program, playerPubkey),
-      findCurrentRound(program),
+      getCachedGameRound(program),
     ]);
 
     const gs = roundResult?.gameState ?? null;

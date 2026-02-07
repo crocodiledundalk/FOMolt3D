@@ -2,17 +2,17 @@ import Link from "next/link";
 import {
   getReadOnlyProgram,
   fetchGameState,
-  findCurrentRound,
 } from "@/lib/sdk";
+import { getCachedGameRound } from "@/lib/rpc-cache";
 import type { OnChainGameState } from "@/lib/sdk";
-import { formatSol, formatAddress, formatTime } from "@/lib/utils/format";
+import { formatSol, formatAddress } from "@/lib/utils/format";
 import { PAGE_ROUTES } from "@/lib/constants/routes";
 
 async function fetchAllRounds(): Promise<
   { round: number; gameState: OnChainGameState }[]
 > {
   const program = getReadOnlyProgram();
-  const current = await findCurrentRound(program);
+  const current = await getCachedGameRound(program);
   if (!current) return [];
 
   const rounds: { round: number; gameState: OnChainGameState }[] = [];

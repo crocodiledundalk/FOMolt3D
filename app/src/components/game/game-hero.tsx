@@ -6,6 +6,7 @@ import { useFlashOnChange } from "@/hooks/use-flash-on-change";
 import { TimerDisplay } from "./timer-display";
 import { KeyPriceDisplay } from "./key-price-display";
 import { formatSol, formatAddress } from "@/lib/utils/format";
+import { Emoji } from "@/components/ui/emoji";
 import Link from "next/link";
 import { PAGE_ROUTES } from "@/lib/constants/routes";
 
@@ -75,7 +76,7 @@ export function GameHero() {
         {/* Pot display */}
         <div aria-live="polite" className="flex flex-col items-center">
           <span className="text-xs uppercase tracking-[0.2em] text-text-muted">
-            The Pot &#x1F36F;
+            The Pot <Emoji label="honey pot">&#x1F36F;</Emoji>
           </span>
           <span
             className={`tabular-nums text-4xl sm:text-5xl font-bold text-claw-orange md:text-7xl ${
@@ -130,7 +131,7 @@ export function GameHero() {
             }`}
           >
             <span className="text-xs uppercase tracking-[0.2em] text-text-muted">
-              &#x1F451;&#x1F99E; King Claw
+              <Emoji label="king claw">&#x1F451;&#x1F99E;</Emoji> King Claw
             </span>
             <Link
               href={PAGE_ROUTES.AGENT(gameState.lastBuyer)}

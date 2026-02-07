@@ -47,7 +47,7 @@ export async function POST(request: Request) {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
 
   return NextResponse.json({
-    referralUrl: `${baseUrl}?ref=${parsed.data.pubkey}`,
+    referralUrl: `${baseUrl}/api/actions/buy-keys?ref=${parsed.data.pubkey}`,
     referrer: parsed.data.pubkey,
   });
 }

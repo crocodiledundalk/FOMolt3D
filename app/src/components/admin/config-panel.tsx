@@ -9,7 +9,6 @@ import type { Fomolt3d } from "@/lib/idl-types";
 import type { OnChainGlobalConfig } from "@/lib/sdk/types";
 import { buildCreateOrUpdateConfig } from "@/lib/sdk/instructions";
 import { formatSol, formatAddress } from "@/lib/utils/format";
-import { LAMPORTS_PER_SOL } from "@/lib/constants/game";
 import { toast } from "sonner";
 
 interface ConfigPanelProps {

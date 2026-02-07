@@ -7,10 +7,11 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useGameState } from "@/hooks/use-game-state";
 import { usePlayerState } from "@/hooks/use-player-state";
 import { useAnchorProgram } from "@/hooks/use-anchor-program";
-import { findCurrentRound, fetchPlayerState } from "@/lib/sdk/accounts";
+import { fetchGameState, fetchPlayerState } from "@/lib/sdk/accounts";
 import { buildSmartBuy } from "@/lib/sdk/composites";
 import { calculateCost } from "@/lib/utils/bonding-curve";
 import { formatSol } from "@/lib/utils/format";
+import { Emoji } from "@/components/ui/emoji";
 import { parseProgramError } from "@/lib/sdk/errors";
 import { getStoredReferrer } from "@/components/game/referral-capture";
 import { WalletConnect } from "./wallet-connect";
@@ -46,12 +47,18 @@ export function BuyKeysForm() {
 
     setSubmitting(true);
     try {
-      // Fetch fresh on-chain state for the transaction
-      const roundResult = await findCurrentRound(anchor.program);
-      if (!roundResult) {
+      // Use round number from cached API state, fetch fresh on-chain data (1 RPC call)
+      const round = gameData?.gameState.round;
+      if (!round) {
         toast.error("No active round found");
         return;
       }
+      const gameState = await fetchGameState(anchor.program, round);
+      if (!gameState) {
+        toast.error("Failed to fetch round state");
+        return;
+      }
+      const roundResult = { round, gameState };
 
       const onChainPlayerState = await fetchPlayerState(
         anchor.program,
@@ -128,6 +135,7 @@ export function BuyKeysForm() {
     publicKey,
     anchor,
     parsed,
+    gameData,
     playerData,
     connection,
     sendTransaction,
@@ -137,7 +145,7 @@ export function BuyKeysForm() {
   return (
     <div className="border-2 border-claw-orange/30 bg-bg-secondary p-4 glow-orange">
       <h3 className="mb-3 text-sm font-bold uppercase tracking-[0.2em] text-claw-orange">
-        &#x1F99E; Grab Claws
+        <Emoji label="claw">&#x1F99E;</Emoji> Grab Claws
       </h3>
 
       <div className="space-y-3">
