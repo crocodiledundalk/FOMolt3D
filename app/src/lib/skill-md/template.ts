@@ -11,6 +11,7 @@ import { referral } from "./sections/referral";
 import { errorTable } from "./sections/error-table";
 import { leaderboard } from "./sections/leaderboard";
 import { footer } from "./sections/footer";
+import { REFERRALS_ENABLED } from "@/lib/feature-flags";
 
 export function assembleSkillMd(
   state: GameStateResponse,
@@ -23,13 +24,17 @@ export function assembleSkillMd(
     liveStatus(state),
     whatIsThis(state),
     whyPlay(state),
-    quickStart(baseUrl, referrer),
+    quickStart(baseUrl, REFERRALS_ENABLED ? referrer : undefined),
     apiReference(baseUrl),
     monitoring(baseUrl),
     incomeOpportunities(state),
     referral(state, baseUrl),
     errorTable(),
-    leaderboard(leaderboardData.keyHolders, leaderboardData.dividendEarners, leaderboardData.topReferrers),
+    leaderboard(
+      leaderboardData.keyHolders,
+      leaderboardData.dividendEarners,
+      REFERRALS_ENABLED ? leaderboardData.topReferrers : undefined
+    ),
     footer(baseUrl),
   ];
 

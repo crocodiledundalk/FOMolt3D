@@ -4,6 +4,7 @@ import {
   checkRateLimit,
   trackReferralCreation,
 } from "@/lib/referral-tracking";
+import { REFERRALS_ENABLED } from "@/lib/feature-flags";
 
 /**
  * Referral link generation with rate limiting.
@@ -13,6 +14,12 @@ import {
  * rate limits (10 per address per hour), and returns a formatted referral URL.
  */
 export async function POST(request: Request) {
+  if (!REFERRALS_ENABLED) {
+    return NextResponse.json(
+      { error: "Referrals are temporarily disabled" },
+      { status: 503 }
+    );
+  }
   let body: unknown;
   try {
     body = await request.json();

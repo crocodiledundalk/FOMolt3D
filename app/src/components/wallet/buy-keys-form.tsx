@@ -14,6 +14,7 @@ import { formatSol } from "@/lib/utils/format";
 import { Emoji } from "@/components/ui/emoji";
 import { parseProgramError } from "@/lib/sdk/errors";
 import { getStoredReferrer } from "@/components/game/referral-capture";
+import { REFERRALS_ENABLED } from "@/lib/feature-flags";
 import { WalletConnect } from "./wallet-connect";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -66,21 +67,24 @@ export function BuyKeysForm() {
       );
 
       // Parse referrer: use on-chain referrer if set, otherwise check localStorage
+      // (gated behind feature flag — referrals disabled until Dialect approval)
       let referrer: PublicKey | undefined;
-      if (playerData?.playerState?.referrer) {
-        try {
-          referrer = new PublicKey(playerData.playerState.referrer);
-        } catch {
-          // Invalid referrer, skip
-        }
-      } else {
-        // No on-chain referrer yet — check localStorage for ?ref= capture
-        const storedRef = getStoredReferrer();
-        if (storedRef) {
+      if (REFERRALS_ENABLED) {
+        if (playerData?.playerState?.referrer) {
           try {
-            referrer = new PublicKey(storedRef);
+            referrer = new PublicKey(playerData.playerState.referrer);
           } catch {
-            // Invalid stored referrer, skip
+            // Invalid referrer, skip
+          }
+        } else {
+          // No on-chain referrer yet — check localStorage for ?ref= capture
+          const storedRef = getStoredReferrer();
+          if (storedRef) {
+            try {
+              referrer = new PublicKey(storedRef);
+            } catch {
+              // Invalid stored referrer, skip
+            }
           }
         }
       }

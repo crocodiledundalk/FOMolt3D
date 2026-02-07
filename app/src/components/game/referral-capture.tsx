@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { useSearchParams } from "next/navigation";
+import { REFERRALS_ENABLED } from "@/lib/feature-flags";
 
 const STORAGE_KEY = "fomolt3d_referrer";
 
@@ -18,6 +19,8 @@ export function ReferralCapture() {
   const searchParams = useSearchParams();
 
   useEffect(() => {
+    if (!REFERRALS_ENABLED) return;
+
     const ref = searchParams.get("ref");
     if (!ref) return;
 
@@ -33,8 +36,9 @@ export function ReferralCapture() {
   return null;
 }
 
-/** Read the stored referrer from localStorage. */
+/** Read the stored referrer from localStorage. Returns null when referrals are disabled. */
 export function getStoredReferrer(): string | null {
+  if (!REFERRALS_ENABLED) return null;
   try {
     return localStorage.getItem(STORAGE_KEY);
   } catch {

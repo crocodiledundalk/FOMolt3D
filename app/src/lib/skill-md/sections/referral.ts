@@ -1,6 +1,9 @@
 import type { GameStateResponse } from "@/types/api";
+import { REFERRALS_ENABLED } from "@/lib/feature-flags";
 
 export function referral(state: GameStateResponse, baseUrl: string): string {
+  if (!REFERRALS_ENABLED) return "";
+
   const referralPct = state.gameState.referralBonusBps / 100;
 
   return `

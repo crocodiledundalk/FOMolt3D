@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useGameState } from "@/hooks/use-game-state";
 import { formatSol } from "@/lib/utils/format";
+import { REFERRALS_ENABLED } from "@/lib/feature-flags";
 
 interface ShareButtonProps {
   variant?: "hero" | "compact";
@@ -21,7 +22,7 @@ export function ShareButton({ variant = "compact", className = "" }: ShareButton
 
   if (!origin) return null;
 
-  const walletRef = publicKey ? `?ref=${publicKey.toBase58()}` : "";
+  const walletRef = REFERRALS_ENABLED && publicKey ? `?ref=${publicKey.toBase58()}` : "";
   const blinkUrl = `https://dial.to/?action=solana-action:${origin}/api/actions/buy-keys${walletRef}`;
 
   const potText = gameData

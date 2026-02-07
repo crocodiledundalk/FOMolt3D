@@ -14,8 +14,10 @@ import { parseProgramError } from "@/lib/sdk/errors";
 import { formatSol } from "@/lib/utils/format";
 import { Emoji } from "@/components/ui/emoji";
 import { toast } from "sonner";
+import { REFERRALS_ENABLED } from "@/lib/feature-flags";
 
 export function ReferralCTA() {
+  if (!REFERRALS_ENABLED) return null;
   const { publicKey, sendTransaction } = useWallet();
   const { connection } = useConnection();
   const { isAgent } = useMode();

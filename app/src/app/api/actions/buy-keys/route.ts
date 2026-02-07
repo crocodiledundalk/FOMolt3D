@@ -16,6 +16,7 @@ import {
 import { getCachedGameRound } from "@/lib/rpc-cache";
 import { formatSol, formatAddress, formatTime } from "@/lib/utils/format";
 import { ACTIONS_CORS_HEADERS, actionsOptions } from "@/lib/actions-headers";
+import { REFERRALS_ENABLED } from "@/lib/feature-flags";
 
 // ---------------------------------------------------------------------------
 // GET — The shareable Blink card
@@ -24,7 +25,7 @@ export async function GET(request: Request) {
   try {
     const reqUrl = new URL(request.url);
     const baseUrl = reqUrl.origin;
-    const ref = reqUrl.searchParams.get("ref");
+    const ref = REFERRALS_ENABLED ? reqUrl.searchParams.get("ref") : null;
 
     const program = getReadOnlyProgram();
     const result = await getCachedGameRound(program);
@@ -197,14 +198,16 @@ export async function POST(request: Request) {
 
     const playerState = await fetchPlayerState(program, buyer);
 
-    // Parse optional referrer
+    // Parse optional referrer (gated behind feature flag)
     let referrer: PublicKey | undefined;
-    const refParam = url.searchParams.get("ref");
-    if (refParam && /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(refParam)) {
-      try {
-        referrer = new PublicKey(refParam);
-      } catch {
-        // Invalid pubkey, ignore
+    if (REFERRALS_ENABLED) {
+      const refParam = url.searchParams.get("ref");
+      if (refParam && /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(refParam)) {
+        try {
+          referrer = new PublicKey(refParam);
+        } catch {
+          // Invalid pubkey, ignore
+        }
       }
     }
 
@@ -311,11 +314,15 @@ function roundEndedBlink(
           label: "Claim Dividends",
           href: "/api/actions/claim-dividends",
         },
-        {
-          type: "transaction",
-          label: "Claim Referral",
-          href: "/api/actions/claim-referral-earnings",
-        },
+        ...(REFERRALS_ENABLED
+          ? [
+              {
+                type: "transaction",
+                label: "Claim Referral",
+                href: "/api/actions/claim-referral-earnings",
+              },
+            ]
+          : []),
         {
           type: "external-link",
           label: "View Results",

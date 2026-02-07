@@ -9,6 +9,7 @@ import {
 } from "@/lib/rpc-cache";
 import type { LeaderboardResponse } from "@/types/api";
 import type { LeaderboardEntry, ReferralEntry } from "@/types/game";
+import { REFERRALS_ENABLED } from "@/lib/feature-flags";
 
 export const dynamic = "force-dynamic";
 
@@ -60,41 +61,40 @@ export async function GET() {
         isAgent: player.isAgent,
       }));
 
-    // Build top referrers: group by the `referrer` field on referred players,
-    // count distinct referrals, and look up earnings from referrer's own PlayerState.
-    const referralCounts = new Map<string, number>();
-    const referrerEarnings = new Map<string, number>();
+    // Build top referrers (gated behind feature flag — disabled until Dialect approval)
+    let topReferrers: ReferralEntry[] = [];
+    if (REFERRALS_ENABLED) {
+      const referralCounts = new Map<string, number>();
+      const referrerEarnings = new Map<string, number>();
 
-    // Count how many players each referrer has referred (from referrer field)
-    for (const p of players) {
-      if (p.referrer) {
-        const refKey = p.referrer.toBase58();
-        referralCounts.set(refKey, (referralCounts.get(refKey) ?? 0) + 1);
+      for (const p of players) {
+        if (p.referrer) {
+          const refKey = p.referrer.toBase58();
+          referralCounts.set(refKey, (referralCounts.get(refKey) ?? 0) + 1);
+        }
       }
-    }
 
-    // Get earnings for players who are referrers (from their own PlayerState)
-    for (const p of players) {
-      if (p.referralEarningsLamports > 0) {
-        referrerEarnings.set(p.player.toBase58(), p.referralEarningsLamports);
+      for (const p of players) {
+        if (p.referralEarningsLamports > 0) {
+          referrerEarnings.set(p.player.toBase58(), p.referralEarningsLamports);
+        }
       }
+
+      const allReferrers = new Set([
+        ...referralCounts.keys(),
+        ...referrerEarnings.keys(),
+      ]);
+
+      topReferrers = [...allReferrers]
+        .map((ref) => ({
+          referrer: ref,
+          referrals: referralCounts.get(ref) ?? 0,
+          totalEarnings: referrerEarnings.get(ref) ?? 0,
+        }))
+        .filter((r) => r.totalEarnings > 0 || r.referrals > 0)
+        .sort((a, b) => b.totalEarnings - a.totalEarnings)
+        .slice(0, 20);
     }
-
-    // Merge all unique referrer addresses
-    const allReferrers = new Set([
-      ...referralCounts.keys(),
-      ...referrerEarnings.keys(),
-    ]);
-
-    const topReferrers: ReferralEntry[] = [...allReferrers]
-      .map((ref) => ({
-        referrer: ref,
-        referrals: referralCounts.get(ref) ?? 0,
-        totalEarnings: referrerEarnings.get(ref) ?? 0,
-      }))
-      .filter((r) => r.totalEarnings > 0 || r.referrals > 0)
-      .sort((a, b) => b.totalEarnings - a.totalEarnings)
-      .slice(0, 20);
 
     const response: LeaderboardResponse = {
       keyHolders,

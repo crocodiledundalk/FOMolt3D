@@ -1,5 +1,4 @@
-import { describe, it, expect } from "vitest";
-import { assembleSkillMd } from "./template";
+import { describe, it, expect, vi } from "vitest";
 import type { GameStateResponse, LeaderboardResponse } from "@/types/api";
 
 const mockState: GameStateResponse = {
@@ -42,7 +41,10 @@ const mockLeaderboard: LeaderboardResponse = {
 };
 
 describe("assembleSkillMd", () => {
-  it("produces valid markdown with all sections", () => {
+  it("produces valid markdown with all sections (referrals disabled)", async () => {
+    vi.stubEnv("NEXT_PUBLIC_REFERRALS_ENABLED", "false");
+    // Re-import to pick up fresh env
+    const { assembleSkillMd } = await import("./template");
     const md = assembleSkillMd(mockState, mockLeaderboard, "http://localhost:3000");
 
     // Should not contain undefined, null, or NaN
@@ -58,18 +60,38 @@ describe("assembleSkillMd", () => {
     expect(md).toContain("## API Reference");
     expect(md).toContain("## Monitoring");
     expect(md).toContain("## Income Opportunities");
-    expect(md).toContain("## Shell Link System");
     expect(md).toContain("## Error Codes");
     expect(md).toContain("## Claw Rankings");
     expect(md).toContain("localhost:3000");
+
+    // Referral section should NOT appear when disabled
+    expect(md).not.toContain("## Shell Link System");
+
+    vi.unstubAllEnvs();
   });
 
-  it("does not contain removed sections", () => {
+  it("includes referral section when enabled", async () => {
+    vi.stubEnv("NEXT_PUBLIC_REFERRALS_ENABLED", "true");
+    // Dynamic import to pick up env change (modules are cached, so reset first)
+    vi.resetModules();
+    const { assembleSkillMd } = await import("./template");
+    const md = assembleSkillMd(mockState, mockLeaderboard, "http://localhost:3000");
+
+    expect(md).toContain("## Shell Link System");
+    expect(md).toContain("shell link");
+
+    vi.unstubAllEnvs();
+    vi.resetModules();
+  });
+
+  it("does not contain removed sections", async () => {
+    const { assembleSkillMd } = await import("./template");
     const md = assembleSkillMd(mockState, mockLeaderboard, "http://localhost:3000");
     expect(md).not.toContain("## Strategy Guide");
   });
 
-  it("includes live game data in pitch", () => {
+  it("includes live game data in pitch", async () => {
+    const { assembleSkillMd } = await import("./template");
     const md = assembleSkillMd(mockState, mockLeaderboard, "http://localhost:3000");
 
     // Should include pot value
@@ -84,17 +106,18 @@ describe("assembleSkillMd", () => {
     expect(md).toContain(":1");
   });
 
-  it("includes leaderboard entries with type badges", () => {
+  it("includes leaderboard entries with type badges", async () => {
+    const { assembleSkillMd } = await import("./template");
     const md = assembleSkillMd(mockState, mockLeaderboard, "http://localhost:3000");
     expect(md).toContain("AgNt");
     expect(md).toContain("85");
   });
 
-  it("uses crustacean terminology", () => {
+  it("uses crustacean terminology", async () => {
+    const { assembleSkillMd } = await import("./template");
     const md = assembleSkillMd(mockState, mockLeaderboard, "http://localhost:3000");
     expect(md).toContain("King Claw");
     expect(md).toContain("claws");
     expect(md).toContain("scraps");
-    expect(md).toContain("shell link");
   });
 });
