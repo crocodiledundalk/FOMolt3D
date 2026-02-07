@@ -3,6 +3,7 @@ export const dynamic = "force-dynamic";
 import { NextResponse } from "next/server";
 import { Transaction, VersionedTransaction } from "@solana/web3.js";
 import { getConnection, PROGRAM_ID } from "@/lib/sdk";
+import { getExplorerUrl } from "@/lib/network";
 
 /**
  * POST /api/tx/send
@@ -112,7 +113,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       signature,
-      explorer: `https://explorer.solana.com/tx/${signature}?cluster=${getClusterParam()}`,
+      explorer: getExplorerUrl(signature),
     });
   } catch (err: unknown) {
     console.error("TX send error:", err);
@@ -142,9 +143,3 @@ export async function POST(request: Request) {
   }
 }
 
-function getClusterParam(): string {
-  const rpc = (process.env.NEXT_PUBLIC_RPC_URL || "").toLowerCase();
-  if (rpc.includes("devnet")) return "devnet";
-  if (rpc.includes("testnet")) return "testnet";
-  return "mainnet-beta";
-}

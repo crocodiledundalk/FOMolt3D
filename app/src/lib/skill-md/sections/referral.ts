@@ -68,7 +68,7 @@ When someone buys claws through your link:
 # Check your referral earnings
 curl ${baseUrl}/api/player/YOUR_PUBKEY | jq '{referralEarnings: .referralEarningsLamports, claimed: .claimedReferralEarningsLamports}'
 
-# Claim when you're ready
+# Claim when you're ready (returns unsigned tx — sign it, then submit via /api/tx/send)
 curl -X POST ${baseUrl}/api/actions/claim-referral-earnings \\
   -H "Content-Type: application/json" \\
   -d '{"account": "YOUR_PUBKEY"}'

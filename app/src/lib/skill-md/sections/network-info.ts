@@ -4,7 +4,8 @@ export interface NetworkInfo {
   programId: string;
 }
 
-export function networkInfo(network: NetworkInfo): string {
+export function networkInfo(network: NetworkInfo, baseUrl?: string): string {
+  const base = baseUrl || "BASE_URL";
   const isDevnet = network.cluster === "devnet";
   const warning = isDevnet
     ? `\n> **This is Solana DEVNET.** All SOL is free test tokens. Do NOT send real SOL here. Use \`solana airdrop 2 --url devnet\` for free test SOL.`
@@ -25,7 +26,7 @@ ${warning}
 **Easiest (recommended):** After signing a transaction, POST it back to our send endpoint — we forward it to the correct network automatically:
 
 \`\`\`bash
-curl -X POST BASE_URL/api/tx/send \\
+curl -X POST ${base}/api/tx/send \\
   -H "Content-Type: application/json" \\
   -d '{"transaction": "BASE64_SIGNED_TX"}'
 \`\`\`

@@ -11,9 +11,11 @@ import {
 import { getCachedGameRound } from "@/lib/rpc-cache";
 import { formatSol } from "@/lib/utils/format";
 import { ACTIONS_CORS_HEADERS, actionsOptions } from "@/lib/actions-headers";
+import { getBaseUrlFromEnv } from "@/lib/network";
 
 export async function GET() {
   try {
+    const iconUrl = getBaseUrlFromEnv();
     const program = getReadOnlyProgram();
     const result = await getCachedGameRound(program);
 
@@ -21,7 +23,7 @@ export async function GET() {
       return NextResponse.json(
         {
           type: "action",
-          icon: "https://fomolt3d.com/icon.png",
+          icon: `${iconUrl}/icon.png`,
           title: "FOMolt3D — No Active Round",
           description: "No round exists yet.",
           label: "No Round",
@@ -33,7 +35,7 @@ export async function GET() {
 
     const response = {
       type: "action",
-      icon: "https://fomolt3d.com/icon.png",
+      icon: `${iconUrl}/icon.png`,
       title: "FOMolt3D — Claim Referral Earnings",
       description: "Claim your accumulated referral earnings. You earn a percentage of every transaction by players you referred.",
       label: "Claim Referral Earnings",

@@ -15,9 +15,11 @@ import {
 import { getCachedGameRound } from "@/lib/rpc-cache";
 import { formatSol } from "@/lib/utils/format";
 import { ACTIONS_CORS_HEADERS, actionsOptions } from "@/lib/actions-headers";
+import { getBaseUrlFromEnv } from "@/lib/network";
 
 export async function GET() {
   try {
+    const iconUrl = getBaseUrlFromEnv();
     const program = getReadOnlyProgram();
     const result = await getCachedGameRound(program);
 
@@ -25,7 +27,7 @@ export async function GET() {
       return NextResponse.json(
         {
           type: "action",
-          icon: "https://fomolt3d.com/icon.png",
+          icon: `${iconUrl}/icon.png`,
           title: "FOMolt3D — No Active Round",
           description: "No round is currently active.",
           label: "No Round",
@@ -44,7 +46,7 @@ export async function GET() {
       return NextResponse.json(
         {
           type: "action",
-          icon: "https://fomolt3d.com/icon.png",
+          icon: `${iconUrl}/icon.png`,
           title: "FOMolt3D — Molt Still Active",
           description: `Molt #${state.round} is still active. You can claim scraps once the timer expires.`,
           label: "Molt Active",
@@ -56,7 +58,7 @@ export async function GET() {
 
     const response = {
       type: "action",
-      icon: "https://fomolt3d.com/icon.png",
+      icon: `${iconUrl}/icon.png`,
       title: "FOMolt3D — Harvest Your Scraps",
       description: `Molt #${state.round} has ended. Harvest your accumulated scraps. Pot: ${formatSol(state.potLamports, 2)} SOL.`,
       label: "Harvest Scraps",

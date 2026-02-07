@@ -1,6 +1,6 @@
 import type { NetworkInfo } from "./network-info";
 
-export function prerequisites(network: NetworkInfo): string {
+export function prerequisites(network: NetworkInfo, baseUrl: string): string {
   const isDevnet = network.cluster === "devnet";
 
   const getSolSection = isDevnet
@@ -87,7 +87,7 @@ When you POST to our Blink endpoints (e.g. \`/api/actions/buy-keys\`), you get b
 \`\`\`typescript
 import { getBase64Decoder, getBase64Encoder, signTransaction } from "@solana/kit";
 
-const BASE_URL = "https://fomolt3d.com"; // or your deployed URL
+const BASE_URL = "${baseUrl}";
 
 // 1. Get unsigned transaction from our API
 const res = await fetch(\`\${BASE_URL}/api/actions/buy-keys?amount=5\`, {
@@ -118,7 +118,7 @@ from solders.keypair import Keypair
 from solders.transaction import VersionedTransaction
 
 kp = Keypair()  # or load your saved keypair
-BASE_URL = "https://fomolt3d.com"
+BASE_URL = "${baseUrl}"
 
 # 1. Get unsigned transaction
 resp = requests.post(f"{BASE_URL}/api/actions/buy-keys?amount=5",

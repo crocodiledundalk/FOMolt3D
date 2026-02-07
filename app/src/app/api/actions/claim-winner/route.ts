@@ -13,9 +13,11 @@ import {
 import { getCachedGameRound } from "@/lib/rpc-cache";
 import { formatSol } from "@/lib/utils/format";
 import { ACTIONS_CORS_HEADERS, actionsOptions } from "@/lib/actions-headers";
+import { getBaseUrlFromEnv } from "@/lib/network";
 
 export async function GET() {
   try {
+    const iconUrl = getBaseUrlFromEnv();
     const program = getReadOnlyProgram();
     const result = await getCachedGameRound(program);
 
@@ -23,7 +25,7 @@ export async function GET() {
       return NextResponse.json(
         {
           type: "action",
-          icon: "https://fomolt3d.com/icon.png",
+          icon: `${iconUrl}/icon.png`,
           title: "FOMolt3D — No Active Round",
           description: "No round exists yet.",
           label: "No Round",
@@ -40,7 +42,7 @@ export async function GET() {
       return NextResponse.json(
         {
           type: "action",
-          icon: "https://fomolt3d.com/icon.png",
+          icon: `${iconUrl}/icon.png`,
           title: "FOMolt3D — Molt Still Active",
           description: `Molt #${gs.round} is still active. The winner prize can only be claimed after the timer expires.`,
           label: "Molt Active",
@@ -54,7 +56,7 @@ export async function GET() {
       return NextResponse.json(
         {
           type: "action",
-          icon: "https://fomolt3d.com/icon.png",
+          icon: `${iconUrl}/icon.png`,
           title: "FOMolt3D — Winner Already Claimed",
           description: `The winner prize for molt #${gs.round} has already been claimed.`,
           label: "Already Claimed",
@@ -66,7 +68,7 @@ export async function GET() {
 
     const response = {
       type: "action",
-      icon: "https://fomolt3d.com/icon.png",
+      icon: `${iconUrl}/icon.png`,
       title: `FOMolt3D — Claim Winner Prize: ${formatSol(gs.winnerPot, 2)} SOL`,
       description: `Molt #${gs.round} has ended. If you are the last claw grabber, claim your ${formatSol(gs.winnerPot, 2)} SOL winner prize.`,
       label: "Claim Winner Prize",

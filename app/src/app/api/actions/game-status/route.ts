@@ -6,16 +6,18 @@ import {
 import { getCachedGameRound } from "@/lib/rpc-cache";
 import { formatSol, formatTime, formatAddress } from "@/lib/utils/format";
 import { ACTIONS_CORS_HEADERS, actionsOptions } from "@/lib/actions-headers";
+import { getBaseUrlFromEnv } from "@/lib/network";
 
 export async function GET() {
   try {
+    const iconUrl = getBaseUrlFromEnv();
     const program = getReadOnlyProgram();
     const result = await getCachedGameRound(program);
 
     if (!result) {
       const response = {
         type: "action",
-        icon: "https://fomolt3d.com/icon.png",
+        icon: `${iconUrl}/icon.png`,
         title: "FOMolt3D — No active round",
         description: "No game rounds found. Waiting for initialization.",
         label: "View Game",
@@ -32,7 +34,7 @@ export async function GET() {
 
     const response = {
       type: "action",
-      icon: "https://fomolt3d.com/icon.png",
+      icon: `${iconUrl}/icon.png`,
       title: `\uD83E\uDD9E Molt #${gameState.round} \u2014 ${formatTime(remaining)} remaining`,
       description: [
         `Pot: ${formatSol(gameState.potLamports, 2)} SOL`,

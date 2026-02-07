@@ -11,9 +11,17 @@ const typeBadge: Record<GameEvent["type"], { label: string; className: string }>
   ROUND_START: { label: "NEW ROUND", className: "bg-claw-purple/15 text-claw-purple border border-claw-purple/30" },
 };
 
+const EXPLORER_CLUSTER = (() => {
+  const rpc = (process.env.NEXT_PUBLIC_RPC_URL || "").toLowerCase();
+  if (rpc.includes("devnet")) return "devnet";
+  if (rpc.includes("testnet")) return "testnet";
+  return "mainnet-beta";
+})();
+
 function ExplorerLink({ signature }: { signature: string }) {
   const truncated = `${signature.slice(0, 6)}..${signature.slice(-4)}`;
-  const href = `https://explorer.solana.com/tx/${signature}?cluster=devnet`;
+  const clusterParam = EXPLORER_CLUSTER === "mainnet-beta" ? "" : `?cluster=${EXPLORER_CLUSTER}`;
+  const href = `https://explorer.solana.com/tx/${signature}${clusterParam}`;
   return (
     <a
       href={href}

@@ -40,6 +40,20 @@ export function getPublicRpcUrl(): string {
   return PUBLIC_RPC_URL;
 }
 
+/** The public base URL for the app (used for icon URLs, etc.) */
+export function getBaseUrlFromEnv(): string {
+  return (
+    process.env.NEXT_PUBLIC_BASE_URL || "https://fomolt3d.com"
+  ).replace(/\/$/, "");
+}
+
+/** Solana explorer URL for a transaction. */
+export function getExplorerUrl(signature: string): string {
+  const cluster = getCluster();
+  const param = cluster === "mainnet-beta" ? "" : `?cluster=${cluster}`;
+  return `https://explorer.solana.com/tx/${signature}${param}`;
+}
+
 /** The program ID from env. */
 export function getProgramId(): string {
   return (
