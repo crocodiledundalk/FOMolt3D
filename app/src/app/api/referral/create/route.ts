@@ -4,6 +4,7 @@ import {
   checkRateLimit,
   trackReferralCreation,
 } from "@/lib/referral-tracking";
+import { REFERRALS_ENABLED } from "@/lib/feature-flags";
 
 /**
  * Referral link generation with rate limiting.
@@ -49,9 +50,13 @@ export async function POST(request: Request) {
   const referralUrl = `${baseUrl}?ref=${parsed.data.pubkey}`;
   const actionUrl = `${baseUrl}/api/actions/buy-keys?ref=${parsed.data.pubkey}`;
 
-  return NextResponse.json({
-    referralUrl,
-    blinkUrl: `https://dial.to/?action=solana-action:${actionUrl}`,
+  const response: Record<string, string> = {
+    referralUrl: actionUrl,
     referrer: parsed.data.pubkey,
-  });
+  };
+  if (REFERRALS_ENABLED) {
+    response.blinkUrl = `https://dial.to/?action=solana-action:${actionUrl}`;
+  }
+
+  return NextResponse.json(response);
 }

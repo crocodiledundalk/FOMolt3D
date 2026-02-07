@@ -39,15 +39,35 @@ function getSnapshotAt(ageMs: number): StateSnapshot | null {
   if (snapshots.length === 0) return null;
 
   // Binary search for closest timestamp
-  let best = snapshots[0];
+  let lo = 0;
+  let hi = snapshots.length - 1;
+  while (lo <= hi) {
+    const mid = Math.floor((lo + hi) / 2);
+    const ts = snapshots[mid].timestamp;
+    if (ts === target) return snapshots[mid];
+    if (ts < target) {
+      lo = mid + 1;
+    } else {
+      hi = mid - 1;
+    }
+  }
+
+  const candidates: StateSnapshot[] = [];
+  if (lo < snapshots.length) candidates.push(snapshots[lo]);
+  if (hi >= 0) candidates.push(snapshots[hi]);
+
+  if (candidates.length === 0) return null;
+
+  let best = candidates[0];
   let bestDiff = Math.abs(best.timestamp - target);
-  for (const s of snapshots) {
+  for (const s of candidates.slice(1)) {
     const diff = Math.abs(s.timestamp - target);
     if (diff < bestDiff) {
       best = s;
       bestDiff = diff;
     }
   }
+
   // Only return if within 2x the requested age (reasonable data)
   if (bestDiff > ageMs) return null;
   return best;

@@ -14,6 +14,7 @@ import { parseProgramError } from "@/lib/sdk/errors";
 import { formatSol } from "@/lib/utils/format";
 import { Emoji } from "@/components/ui/emoji";
 import { toast } from "sonner";
+import { REFERRALS_ENABLED } from "@/lib/feature-flags";
 
 export function ReferralCTA() {
   const { publicKey, sendTransaction } = useWallet();
@@ -146,15 +147,19 @@ export function ReferralCTA() {
               >
                 Copy Ref Link
               </button>
-              <button
-                onClick={copyBlinkUrl}
-                className="border-2 border-claw-cyan/30 bg-claw-cyan/10 px-4 py-2 text-sm font-bold text-claw-cyan transition-colors hover:bg-claw-cyan/20"
-              >
-                Copy Blink for X
-              </button>
+              {REFERRALS_ENABLED && (
+                <button
+                  onClick={copyBlinkUrl}
+                  className="border-2 border-claw-cyan/30 bg-claw-cyan/10 px-4 py-2 text-sm font-bold text-claw-cyan transition-colors hover:bg-claw-cyan/20"
+                >
+                  Copy Blink for X
+                </button>
+              )}
             </div>
           )}
-          <p className="text-xs text-text-muted">use the Blink for X/Twitter, the ref link everywhere else</p>
+          {REFERRALS_ENABLED && (
+            <p className="text-xs text-text-muted">use the Blink for X/Twitter, the ref link everywhere else</p>
+          )}
         </div>
       </section>
     );
@@ -180,12 +185,14 @@ export function ReferralCTA() {
               >
                 Copy Ref Link
               </button>
-              <button
-                onClick={copyBlinkUrl}
-                className="border border-claw-cyan/30 bg-claw-cyan/10 px-3 py-1 text-xs font-bold text-claw-cyan transition-colors hover:bg-claw-cyan/20"
-              >
-                Copy Blink for X
-              </button>
+              {REFERRALS_ENABLED && (
+                <button
+                  onClick={copyBlinkUrl}
+                  className="border border-claw-cyan/30 bg-claw-cyan/10 px-3 py-1 text-xs font-bold text-claw-cyan transition-colors hover:bg-claw-cyan/20"
+                >
+                  Copy Blink for X
+                </button>
+              )}
             </div>
           )}
         </div>

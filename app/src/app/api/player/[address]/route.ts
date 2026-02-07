@@ -11,6 +11,8 @@ import { pubkeySchema } from "@/lib/validations/game";
 import type { PlayerStateResponse } from "@/types/api";
 import type { PlayerStatus } from "@/types/game";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(
   _request: Request,
   { params }: { params: Promise<{ address: string }> }
@@ -55,10 +57,10 @@ export async function GET(
 
     if (!ps) {
       // Player has no on-chain state — return status only (needs registration)
-      return NextResponse.json({
-        playerState: null,
-        status,
-      });
+      return NextResponse.json(
+        { playerState: null, status },
+        { headers: { "Cache-Control": "no-store, max-age=0" } }
+      );
     }
 
     const response: PlayerStateResponse = {
@@ -66,7 +68,9 @@ export async function GET(
       status,
     };
 
-    return NextResponse.json(response);
+    return NextResponse.json(response, {
+      headers: { "Cache-Control": "no-store, max-age=0" },
+    });
   } catch (err) {
     console.error("Failed to fetch player state:", err);
     return NextResponse.json(

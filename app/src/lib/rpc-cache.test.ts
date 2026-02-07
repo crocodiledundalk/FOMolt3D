@@ -106,9 +106,9 @@ describe("rpc-cache", () => {
 
       await getCachedGameRound(fakeProgram);
 
-      // Advance time past TTL (5s)
+      // Advance time past TTL (10s)
       vi.useFakeTimers();
-      vi.advanceTimersByTime(6000);
+      vi.advanceTimersByTime(11000);
 
       const result = await getCachedGameRound(fakeProgram);
       expect(result).toEqual(data2);
