@@ -1,0 +1,32 @@
+# Anchor / Solana build artifacts
+target/
+.anchor/
+node_modules/
+
+# Test artifacts
+test-ledger/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Event cache
+.cache/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Keys (never commit)
+*.json.bak
+keypair*.json
+deploy-keypair*.json
+
+

@@ -1,0 +1,1539 @@
+{
+  "address": "EebbWtjHyocWPwZaQ4k2L61mSdW6y175knsEwppTpdWw",
+  "metadata": {
+    "name": "fomolt3d",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "AI-agent-first FOMO3D game theory experiment on Solana"
+  },
+  "instructions": [
+    {
+      "name": "buy_keys",
+      "discriminator": [
+        24,
+        8,
+        156,
+        247,
+        54,
+        32,
+        202,
+        117
+      ],
+      "accounts": [
+        {
+          "name": "buyer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "game_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  103,
+                  97,
+                  109,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "game_state.round",
+                "account": "GameState"
+              }
+            ]
+          }
+        },
+        {
+          "name": "player_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  108,
+                  97,
+                  121,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "buyer"
+              }
+            ]
+          }
+        },
+        {
+          "name": "vault",
+          "docs": [
+            "Game vault PDA that holds SOL"
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "game_state"
+              }
+            ]
+          }
+        },
+        {
+          "name": "protocol_wallet",
+          "docs": [
+            "Protocol fee recipient wallet"
+          ],
+          "writable": true
+        },
+        {
+          "name": "referrer_state",
+          "docs": [
+            "Optional referrer's PlayerState — must be writable for referral credit."
+          ],
+          "writable": true,
+          "optional": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "keys_to_buy",
+          "type": "u64"
+        },
+        {
+          "name": "is_agent",
+          "type": "bool"
+        }
+      ]
+    },
+    {
+      "name": "claim",
+      "discriminator": [
+        62,
+        198,
+        214,
+        193,
+        213,
+        159,
+        108,
+        210
+      ],
+      "accounts": [
+        {
+          "name": "player",
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "player_state"
+          ]
+        },
+        {
+          "name": "game_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  103,
+                  97,
+                  109,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "game_state.round",
+                "account": "GameState"
+              }
+            ]
+          }
+        },
+        {
+          "name": "player_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  108,
+                  97,
+                  121,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "player"
+              }
+            ]
+          }
+        },
+        {
+          "name": "vault",
+          "docs": [
+            "Game vault PDA that holds SOL"
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "game_state"
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "claim_referral_earnings",
+      "discriminator": [
+        162,
+        50,
+        120,
+        14,
+        177,
+        183,
+        159,
+        153
+      ],
+      "accounts": [
+        {
+          "name": "player",
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "player_state"
+          ]
+        },
+        {
+          "name": "game_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  103,
+                  97,
+                  109,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "game_state.round",
+                "account": "GameState"
+              }
+            ]
+          }
+        },
+        {
+          "name": "player_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  108,
+                  97,
+                  121,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "player"
+              }
+            ]
+          }
+        },
+        {
+          "name": "vault",
+          "docs": [
+            "Game vault PDA that holds SOL"
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "game_state"
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "create_or_update_config",
+      "discriminator": [
+        250,
+        130,
+        73,
+        220,
+        98,
+        190,
+        198,
+        143
+      ],
+      "accounts": [
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": {
+              "name": "ConfigParams"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "initialize_first_round",
+      "discriminator": [
+        168,
+        192,
+        19,
+        39,
+        240,
+        6,
+        90,
+        67
+      ],
+      "accounts": [
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "game_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  103,
+                  97,
+                  109,
+                  101
+                ]
+              },
+              {
+                "kind": "const",
+                "value": [
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "vault",
+          "docs": [
+            "Game vault PDA that holds SOL"
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "game_state"
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "start_new_round",
+      "discriminator": [
+        180,
+        48,
+        50,
+        160,
+        186,
+        163,
+        79,
+        185
+      ],
+      "accounts": [
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "prev_game_state",
+          "docs": [
+            "Previous round's game state"
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  103,
+                  97,
+                  109,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "prev_game_state.round",
+                "account": "GameState"
+              }
+            ]
+          }
+        },
+        {
+          "name": "new_game_state",
+          "docs": [
+            "New round's game state PDA"
+          ],
+          "writable": true
+        },
+        {
+          "name": "prev_vault",
+          "docs": [
+            "Previous round's vault"
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "prev_game_state"
+              }
+            ]
+          }
+        },
+        {
+          "name": "new_vault",
+          "docs": [
+            "New round's vault"
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "new_game_state"
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    }
+  ],
+  "accounts": [
+    {
+      "name": "GameState",
+      "discriminator": [
+        144,
+        94,
+        208,
+        172,
+        248,
+        99,
+        134,
+        120
+      ]
+    },
+    {
+      "name": "GlobalConfig",
+      "discriminator": [
+        149,
+        8,
+        156,
+        202,
+        160,
+        252,
+        176,
+        217
+      ]
+    },
+    {
+      "name": "PlayerState",
+      "discriminator": [
+        56,
+        3,
+        60,
+        86,
+        174,
+        16,
+        244,
+        195
+      ]
+    }
+  ],
+  "events": [
+    {
+      "name": "Claimed",
+      "discriminator": [
+        217,
+        192,
+        123,
+        72,
+        108,
+        150,
+        248,
+        33
+      ]
+    },
+    {
+      "name": "GameUpdated",
+      "discriminator": [
+        100,
+        97,
+        130,
+        101,
+        84,
+        101,
+        4,
+        15
+      ]
+    },
+    {
+      "name": "KeysPurchased",
+      "discriminator": [
+        187,
+        12,
+        152,
+        10,
+        151,
+        18,
+        44,
+        235
+      ]
+    },
+    {
+      "name": "ProtocolFeeCollected",
+      "discriminator": [
+        149,
+        0,
+        167,
+        154,
+        105,
+        146,
+        209,
+        134
+      ]
+    },
+    {
+      "name": "ReferralClaimed",
+      "discriminator": [
+        195,
+        109,
+        77,
+        196,
+        134,
+        226,
+        78,
+        108
+      ]
+    },
+    {
+      "name": "ReferralEarned",
+      "discriminator": [
+        243,
+        117,
+        80,
+        205,
+        187,
+        9,
+        77,
+        23
+      ]
+    },
+    {
+      "name": "RoundConcluded",
+      "discriminator": [
+        253,
+        3,
+        254,
+        156,
+        25,
+        119,
+        156,
+        173
+      ]
+    },
+    {
+      "name": "RoundStarted",
+      "discriminator": [
+        180,
+        209,
+        2,
+        244,
+        238,
+        48,
+        170,
+        120
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "GameNotActive",
+      "msg": "Game round is not active"
+    },
+    {
+      "code": 6001,
+      "name": "GameStillActive",
+      "msg": "Game round is still active"
+    },
+    {
+      "code": 6002,
+      "name": "TimerExpired",
+      "msg": "Timer has expired"
+    },
+    {
+      "code": 6003,
+      "name": "TimerNotExpired",
+      "msg": "Timer has not expired yet"
+    },
+    {
+      "code": 6004,
+      "name": "InsufficientFunds",
+      "msg": "Insufficient funds for purchase"
+    },
+    {
+      "code": 6005,
+      "name": "NoKeysToBuy",
+      "msg": "Must buy at least one key"
+    },
+    {
+      "code": 6006,
+      "name": "NothingToClaim",
+      "msg": "Nothing to claim"
+    },
+    {
+      "code": 6007,
+      "name": "NotWinner",
+      "msg": "Only the last buyer can claim the winner prize"
+    },
+    {
+      "code": 6008,
+      "name": "WinnerAlreadyClaimed",
+      "msg": "Winner prize has already been claimed"
+    },
+    {
+      "code": 6009,
+      "name": "WinnerNotClaimed",
+      "msg": "Winner has not claimed prize yet"
+    },
+    {
+      "code": 6010,
+      "name": "CannotReferSelf",
+      "msg": "Cannot refer yourself"
+    },
+    {
+      "code": 6011,
+      "name": "ReferrerMismatch",
+      "msg": "Referrer does not match stored referrer"
+    },
+    {
+      "code": 6012,
+      "name": "ReferrerNotRegistered",
+      "msg": "Referrer is not registered in this round"
+    },
+    {
+      "code": 6013,
+      "name": "NoReferralEarnings",
+      "msg": "No referral earnings to claim"
+    },
+    {
+      "code": 6014,
+      "name": "Unauthorized",
+      "msg": "Unauthorized: admin only"
+    },
+    {
+      "code": 6015,
+      "name": "InvalidConfig",
+      "msg": "Invalid configuration parameters"
+    },
+    {
+      "code": 6016,
+      "name": "Overflow",
+      "msg": "Arithmetic overflow"
+    },
+    {
+      "code": 6017,
+      "name": "PlayerAlreadyRegistered",
+      "msg": "Player is already registered in this round"
+    },
+    {
+      "code": 6018,
+      "name": "MustClaimPreviousRound",
+      "msg": "Must claim previous round before joining a new one"
+    },
+    {
+      "code": 6019,
+      "name": "PlayerNotInRound",
+      "msg": "Player is not in this round"
+    }
+  ],
+  "types": [
+    {
+      "name": "Claimed",
+      "docs": [
+        "Emitted when a player claims dividends and/or winner prize"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "round",
+            "type": "u64"
+          },
+          {
+            "name": "player",
+            "type": "pubkey"
+          },
+          {
+            "name": "dividend_lamports",
+            "type": "u64"
+          },
+          {
+            "name": "winner_lamports",
+            "type": "u64"
+          },
+          {
+            "name": "total_lamports",
+            "type": "u64"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ConfigParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "base_price_lamports",
+            "type": "u64"
+          },
+          {
+            "name": "price_increment_lamports",
+            "type": "u64"
+          },
+          {
+            "name": "timer_extension_secs",
+            "type": "i64"
+          },
+          {
+            "name": "max_timer_secs",
+            "type": "i64"
+          },
+          {
+            "name": "winner_bps",
+            "type": "u64"
+          },
+          {
+            "name": "dividend_bps",
+            "type": "u64"
+          },
+          {
+            "name": "next_round_bps",
+            "type": "u64"
+          },
+          {
+            "name": "protocol_fee_bps",
+            "type": "u64"
+          },
+          {
+            "name": "referral_bonus_bps",
+            "type": "u64"
+          },
+          {
+            "name": "protocol_wallet",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "GameState",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "round",
+            "docs": [
+              "Round number (0-indexed)"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "pot_lamports",
+            "docs": [
+              "Total SOL deposited this round (lamports) — informational, tracks gross spend"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "timer_end",
+            "docs": [
+              "Unix timestamp when timer expires"
+            ],
+            "type": "i64"
+          },
+          {
+            "name": "last_buyer",
+            "docs": [
+              "Address of most recent key buyer (potential winner)"
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "total_keys",
+            "docs": [
+              "Total keys sold this round"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "round_start",
+            "docs": [
+              "Unix timestamp of round start"
+            ],
+            "type": "i64"
+          },
+          {
+            "name": "active",
+            "docs": [
+              "Whether round is active"
+            ],
+            "type": "bool"
+          },
+          {
+            "name": "winner_claimed",
+            "docs": [
+              "Whether winner has claimed prize"
+            ],
+            "type": "bool"
+          },
+          {
+            "name": "total_players",
+            "docs": [
+              "Number of unique players in this round"
+            ],
+            "type": "u32"
+          },
+          {
+            "name": "total_dividend_pool",
+            "docs": [
+              "Total lamports allocated to dividends this round (claimed proportionally at round end)"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "next_round_pot",
+            "docs": [
+              "Accumulated carry for next round (lamports)"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "winner_pot",
+            "docs": [
+              "Accumulated winner share (lamports) — paid out on claim"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "base_price_lamports",
+            "docs": [
+              "Snapshot: base price per key in lamports"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "price_increment_lamports",
+            "docs": [
+              "Snapshot: price increment per key"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "timer_extension_secs",
+            "docs": [
+              "Snapshot: seconds added to timer per buy"
+            ],
+            "type": "i64"
+          },
+          {
+            "name": "max_timer_secs",
+            "docs": [
+              "Snapshot: maximum timer duration in seconds"
+            ],
+            "type": "i64"
+          },
+          {
+            "name": "winner_bps",
+            "docs": [
+              "Snapshot: winner share in basis points"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "dividend_bps",
+            "docs": [
+              "Snapshot: dividend share in basis points"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "next_round_bps",
+            "docs": [
+              "Snapshot: next round carry share in basis points"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "protocol_fee_bps",
+            "docs": [
+              "Snapshot: protocol fee in basis points"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "referral_bonus_bps",
+            "docs": [
+              "Snapshot: referral bonus as BPS of dividend portion"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "protocol_wallet",
+            "docs": [
+              "Snapshot: wallet that receives protocol fees"
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "bump",
+            "docs": [
+              "PDA bump seed"
+            ],
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "GameUpdated",
+      "docs": [
+        "Emitted after every key purchase with high-level game state"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "round",
+            "type": "u64"
+          },
+          {
+            "name": "pot_lamports",
+            "type": "u64"
+          },
+          {
+            "name": "total_keys",
+            "type": "u64"
+          },
+          {
+            "name": "next_key_price",
+            "type": "u64"
+          },
+          {
+            "name": "last_buyer",
+            "type": "pubkey"
+          },
+          {
+            "name": "timer_end",
+            "type": "i64"
+          },
+          {
+            "name": "winner_pot",
+            "type": "u64"
+          },
+          {
+            "name": "next_round_pot",
+            "type": "u64"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "GlobalConfig",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "admin",
+            "docs": [
+              "Admin authority — only this signer can update config or start round 1"
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "base_price_lamports",
+            "docs": [
+              "Base price per key in lamports"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "price_increment_lamports",
+            "docs": [
+              "Price increment per key already sold"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "timer_extension_secs",
+            "docs": [
+              "Seconds added to timer per buy"
+            ],
+            "type": "i64"
+          },
+          {
+            "name": "max_timer_secs",
+            "docs": [
+              "Maximum timer duration in seconds"
+            ],
+            "type": "i64"
+          },
+          {
+            "name": "winner_bps",
+            "docs": [
+              "Winner share in basis points"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "dividend_bps",
+            "docs": [
+              "Dividend share in basis points"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "next_round_bps",
+            "docs": [
+              "Next round carry share in basis points"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "protocol_fee_bps",
+            "docs": [
+              "Protocol fee in basis points"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "referral_bonus_bps",
+            "docs": [
+              "Referral bonus as BPS of after-fee amount"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "protocol_wallet",
+            "docs": [
+              "Wallet that receives protocol fees"
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "bump",
+            "docs": [
+              "PDA bump seed"
+            ],
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "KeysPurchased",
+      "docs": [
+        "Emitted on every key purchase"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "round",
+            "type": "u64"
+          },
+          {
+            "name": "player",
+            "type": "pubkey"
+          },
+          {
+            "name": "is_agent",
+            "type": "bool"
+          },
+          {
+            "name": "keys_bought",
+            "type": "u64"
+          },
+          {
+            "name": "total_player_keys",
+            "type": "u64"
+          },
+          {
+            "name": "lamports_spent",
+            "type": "u64"
+          },
+          {
+            "name": "pot_contribution",
+            "type": "u64"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "PlayerState",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "player",
+            "docs": [
+              "Player's wallet address"
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "keys",
+            "docs": [
+              "Keys held in this round"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "current_round",
+            "docs": [
+              "Current round this player is participating in"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "claimed_dividends_lamports",
+            "docs": [
+              "Total dividends already withdrawn (lamports)"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "referrer",
+            "docs": [
+              "Who referred this player (set once, immutable after)"
+            ],
+            "type": {
+              "option": "pubkey"
+            }
+          },
+          {
+            "name": "referral_earnings_lamports",
+            "docs": [
+              "Accumulated earnings from being someone's referrer (not yet claimed)"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "claimed_referral_earnings_lamports",
+            "docs": [
+              "Total referral earnings already claimed"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "is_agent",
+            "docs": [
+              "Whether this player is an AI agent (vs human)"
+            ],
+            "type": "bool"
+          },
+          {
+            "name": "bump",
+            "docs": [
+              "PDA bump seed"
+            ],
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ProtocolFeeCollected",
+      "docs": [
+        "Emitted when protocol fees are collected"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "round",
+            "type": "u64"
+          },
+          {
+            "name": "lamports",
+            "type": "u64"
+          },
+          {
+            "name": "recipient",
+            "type": "pubkey"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ReferralClaimed",
+      "docs": [
+        "Emitted when referral earnings are claimed"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "round",
+            "type": "u64"
+          },
+          {
+            "name": "player",
+            "type": "pubkey"
+          },
+          {
+            "name": "lamports",
+            "type": "u64"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ReferralEarned",
+      "docs": [
+        "Emitted when a referral bonus is earned"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "round",
+            "type": "u64"
+          },
+          {
+            "name": "player",
+            "type": "pubkey"
+          },
+          {
+            "name": "referrer",
+            "type": "pubkey"
+          },
+          {
+            "name": "keys_bought",
+            "type": "u64"
+          },
+          {
+            "name": "lamports_spent",
+            "type": "u64"
+          },
+          {
+            "name": "referrer_lamports",
+            "type": "u64"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "RoundConcluded",
+      "docs": [
+        "Emitted when a round concludes (winner claims or empty round closes)"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "round",
+            "type": "u64"
+          },
+          {
+            "name": "winner",
+            "type": "pubkey"
+          },
+          {
+            "name": "winner_lamports",
+            "type": "u64"
+          },
+          {
+            "name": "pot_lamports",
+            "type": "u64"
+          },
+          {
+            "name": "total_keys",
+            "type": "u64"
+          },
+          {
+            "name": "total_players",
+            "type": "u32"
+          },
+          {
+            "name": "next_round_pot",
+            "type": "u64"
+          },
+          {
+            "name": "round_start",
+            "type": "i64"
+          },
+          {
+            "name": "round_end",
+            "type": "i64"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "RoundStarted",
+      "docs": [
+        "Emitted when a new round starts"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "round",
+            "type": "u64"
+          },
+          {
+            "name": "carry_over_lamports",
+            "type": "u64"
+          },
+          {
+            "name": "timer_end",
+            "type": "i64"
+          },
+          {
+            "name": "base_price_lamports",
+            "type": "u64"
+          },
+          {
+            "name": "price_increment_lamports",
+            "type": "u64"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          }
+        ]
+      }
+    }
+  ]
+}
