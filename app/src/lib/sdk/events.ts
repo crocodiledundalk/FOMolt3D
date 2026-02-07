@@ -267,29 +267,40 @@ export async function fetchRecentEvents(
 
   const feedEvents: FomoltEvent[] = [];
   let feedCount = 0;
+  const CONCURRENCY = 8;
 
   // Signatures arrive newest-first
-  for (const sig of signatures) {
-    if (feedCount >= maxFeedEvents) break;
-    if (sig.err) continue;
-    try {
-      const tx = await connection.getTransaction(sig.signature, {
-        commitment: "confirmed",
-        maxSupportedTransactionVersion: 0,
-      });
-      if (!tx?.meta?.logMessages) continue;
-      const parsed = parseTransactionEvents(tx.meta.logMessages);
-      for (let i = 0; i < parsed.length; i++) {
-        const e = parsed[i];
+  for (let i = 0; i < signatures.length && feedCount < maxFeedEvents; i += CONCURRENCY) {
+    const batch = signatures.slice(i, i + CONCURRENCY);
+    const results = await Promise.allSettled(
+      batch.map((sig) =>
+        sig.err
+          ? Promise.resolve(null)
+          : connection.getTransaction(sig.signature, {
+              commitment: "confirmed",
+              maxSupportedTransactionVersion: 0,
+            })
+      )
+    );
+
+    for (let j = 0; j < batch.length && feedCount < maxFeedEvents; j++) {
+      const sig = batch[j];
+      if (sig.err) continue;
+      const result = results[j];
+      if (result.status !== "fulfilled" || !result.value?.meta?.logMessages) {
+        continue;
+      }
+
+      const parsed = parseTransactionEvents(result.value.meta.logMessages);
+      for (let k = 0; k < parsed.length && feedCount < maxFeedEvents; k++) {
+        const e = parsed[k];
         e.signature = sig.signature;
-        e.key = `${sig.signature}:${i}`;
+        e.key = `${sig.signature}:${k}`;
         if (!feedFilter || FEED_EVENT_TYPES.has(e.type)) {
           feedEvents.push(e);
           feedCount++;
         }
       }
-    } catch {
-      // Skip transactions that fail to fetch
     }
   }
 

@@ -22,8 +22,8 @@ export async function POST(request: Request) {
       );
     }
 
-    const keys = Number(keysToBuy) || 1;
-    if (keys < 1 || keys > 10000) {
+    const keys = Number(keysToBuy);
+    if (!Number.isFinite(keys) || !Number.isInteger(keys) || keys < 1 || keys > 10000) {
       return NextResponse.json(
         { error: "keysToBuy must be between 1 and 10,000" },
         { status: 400 }

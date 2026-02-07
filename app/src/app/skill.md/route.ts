@@ -16,6 +16,8 @@ import { recordSnapshot } from "@/lib/state-history";
 import type { GameStateResponse, LeaderboardResponse } from "@/types/api";
 import type { LeaderboardEntry, ReferralEntry } from "@/types/game";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(request: Request) {
   try {
     const program = getReadOnlyProgram();
@@ -146,7 +148,7 @@ export async function GET(request: Request) {
     return new Response(markdown, {
       headers: {
         "Content-Type": "text/markdown; charset=utf-8",
-        "Cache-Control": "public, max-age=10",
+        "Cache-Control": "no-store, max-age=0",
         Vary: "Accept, User-Agent",
       },
     });

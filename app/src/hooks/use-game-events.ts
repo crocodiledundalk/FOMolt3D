@@ -37,6 +37,8 @@ export function useGameEvents() {
   const [error, setError] = useState(false);
   const retryCount = useRef(0);
   const eventSourceRef = useRef<EventSource | null>(null);
+  const retryTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const activeRef = useRef(true);
   const seenKeys = useRef(new Set<string>());
   const queryClient = useQueryClient();
 
@@ -108,14 +110,20 @@ export function useGameEvents() {
   );
 
   const connect = useCallback(() => {
+    if (!activeRef.current) return;
     if (eventSourceRef.current) {
       eventSourceRef.current.close();
+    }
+    if (retryTimeoutRef.current) {
+      clearTimeout(retryTimeoutRef.current);
+      retryTimeoutRef.current = null;
     }
 
     const es = new EventSource(API_ROUTES.EVENTS);
     eventSourceRef.current = es;
 
     es.onopen = () => {
+      if (!activeRef.current) return;
       setConnected(true);
       setError(false);
       retryCount.current = 0;
@@ -134,13 +142,14 @@ export function useGameEvents() {
     }
 
     es.onerror = () => {
+      if (!activeRef.current) return;
       es.close();
       setConnected(false);
 
       if (retryCount.current < MAX_RETRIES) {
         const delay = BASE_DELAY * Math.pow(2, retryCount.current);
         retryCount.current++;
-        setTimeout(connect, delay);
+        retryTimeoutRef.current = setTimeout(connect, delay);
       } else {
         setError(true);
       }
@@ -148,8 +157,14 @@ export function useGameEvents() {
   }, [handleProgramEvent]);
 
   useEffect(() => {
+    activeRef.current = true;
     connect();
     return () => {
+      activeRef.current = false;
+      if (retryTimeoutRef.current) {
+        clearTimeout(retryTimeoutRef.current);
+        retryTimeoutRef.current = null;
+      }
       eventSourceRef.current?.close();
     };
   }, [connect]);
