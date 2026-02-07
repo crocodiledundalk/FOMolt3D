@@ -169,9 +169,8 @@ export async function POST(request: Request) {
     const tx = new Transaction();
     tx.add(claimIx);
     tx.feePayer = player;
-    tx.recentBlockhash = (
-      await connection.getLatestBlockhash()
-    ).blockhash;
+    const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash("finalized");
+    tx.recentBlockhash = blockhash;
 
     const serialized = tx
       .serialize({ requireAllSignatures: false })
@@ -181,6 +180,7 @@ export async function POST(request: Request) {
       {
         transaction: serialized,
         message: `Claim winner prize: ${formatSol(gameState.winnerPot, 2)} SOL`,
+        lastValidBlockHeight,
       },
       { headers: ACTIONS_CORS_HEADERS }
     );

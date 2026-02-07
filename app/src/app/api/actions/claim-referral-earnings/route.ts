@@ -124,9 +124,8 @@ export async function POST(request: Request) {
     const tx = new Transaction();
     tx.add(ix);
     tx.feePayer = player;
-    tx.recentBlockhash = (
-      await connection.getLatestBlockhash()
-    ).blockhash;
+    const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash("finalized");
+    tx.recentBlockhash = blockhash;
 
     const serialized = tx
       .serialize({ requireAllSignatures: false })
@@ -136,6 +135,7 @@ export async function POST(request: Request) {
       {
         transaction: serialized,
         message: `Claim ${formatSol(unclaimed)} SOL in referral earnings`,
+        lastValidBlockHeight,
       },
       { headers: ACTIONS_CORS_HEADERS }
     );

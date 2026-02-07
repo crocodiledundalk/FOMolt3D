@@ -228,9 +228,8 @@ export async function POST(request: Request) {
     const tx = new Transaction();
     tx.add(...ixs);
     tx.feePayer = buyer;
-    tx.recentBlockhash = (
-      await connection.getLatestBlockhash()
-    ).blockhash;
+    const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash("finalized");
+    tx.recentBlockhash = blockhash;
 
     const serialized = tx
       .serialize({ requireAllSignatures: false })
@@ -243,6 +242,7 @@ export async function POST(request: Request) {
         type: "transaction",
         transaction: serialized,
         message: `Grabbing ${amount} claw${amount > 1 ? "s" : ""} for ~${formatSol(estimate.totalCost)} SOL`,
+        lastValidBlockHeight,
         links: {
           next: {
             type: "post",
