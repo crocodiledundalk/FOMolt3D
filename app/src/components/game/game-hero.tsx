@@ -57,7 +57,7 @@ export function GameHero() {
   return (
     <section className="relative border-2 border-claw-orange/30 bg-bg-secondary p-6 md:p-8 glow-orange animate-claw-glow scanlines overflow-hidden">
       <div className="relative z-10 flex flex-col items-center gap-6">
-        {/* Molt badge */}
+        {/* Round badge */}
         <div className="flex items-center gap-2">
           <span className="border border-border bg-bg-tertiary px-3 py-1 text-xs font-medium text-text-secondary">
             Round #{gameState.round}
@@ -102,11 +102,11 @@ export function GameHero() {
         {(phase === "ended" || phase === "claiming") && (
           <div className="flex flex-col items-center gap-2">
             <span className="text-sm font-bold text-claw-red">
-              Molt has ended
+              Round has ended
             </span>
             <span className="text-xs text-text-muted">
               {phase === "ended"
-                ? "Claim your scraps or start a new molt"
+                ? "Claim your scraps or start a new round"
                 : "Winner claimed — harvest your remaining scraps"}
             </span>
           </div>

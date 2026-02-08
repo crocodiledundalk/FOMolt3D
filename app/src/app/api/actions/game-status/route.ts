@@ -35,7 +35,7 @@ export async function GET(request: Request) {
     const response = {
       type: "action",
       icon: `${iconUrl}/icon.png`,
-      title: `\uD83E\uDD9E Molt #${gameState.round} \u2014 ${formatTime(remaining)} remaining`,
+      title: `\uD83E\uDD9E Round #${gameState.round} \u2014 ${formatTime(remaining)} remaining`,
       description: [
         `Pot: ${formatSol(gameState.potLamports, 2)} SOL`,
         `Claw Price: ${formatSol(price)} SOL`,

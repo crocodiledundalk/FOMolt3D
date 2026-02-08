@@ -45,7 +45,7 @@ export function StartNewRoundPanel() {
       const sig = await sendTransaction(tx, connection);
       await connection.confirmTransaction(sig, "confirmed");
 
-      toast.success(`Molt #${nextRound} started`, {
+      toast.success(`Round #${nextRound} started`, {
         description: `tx: ${sig.slice(0, 8)}...`,
       });
 
@@ -70,10 +70,10 @@ export function StartNewRoundPanel() {
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-cyan-400">
-            Start New Molt
+            Start New Round
           </h3>
           <p className="mt-1 text-xs text-text-secondary">
-            Molt #{gameState.round} has ended.{" "}
+            Round #{gameState.round} has ended.{" "}
             {gameState.nextRoundPot > 0
               ? `${formatSol(gameState.nextRoundPot)} SOL carries over.`
               : "Start a fresh round."}
@@ -84,7 +84,7 @@ export function StartNewRoundPanel() {
           disabled={submitting}
           className="border-2 border-cyan-400 bg-cyan-400/10 px-5 py-2.5 text-sm font-bold text-cyan-400 transition-colors hover:bg-cyan-400/20 disabled:opacity-40 disabled:cursor-not-allowed"
         >
-          {submitting ? "Starting..." : `Start Molt #${nextRound}`}
+          {submitting ? "Starting..." : `Start Round #${nextRound}`}
         </button>
       </div>
     </div>

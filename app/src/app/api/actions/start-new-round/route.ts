@@ -42,9 +42,9 @@ export async function GET(request: Request) {
         {
           type: "action",
           icon: `${iconUrl}/icon.png`,
-          title: "FOMolt3D — Molt Still Active",
-          description: `Molt #${gs.round} is still active. A new round can only start after the current one ends.`,
-          label: "Molt Active",
+          title: "FOMolt3D — Round Still Active",
+          description: `Round #${gs.round} is still active. A new round can only start after the current one ends.`,
+          label: "Round Active",
           disabled: true,
         },
         { headers: ACTIONS_CORS_HEADERS }
@@ -58,13 +58,13 @@ export async function GET(request: Request) {
     const response = {
       type: "action",
       icon: `${iconUrl}/icon.png`,
-      title: `FOMolt3D — Start Molt #${nextRound}`,
-      description: `Molt #${gs.round} has ended. Start the next round with ${carryOver} SOL carry-over from the previous pot. This is permissionless — anyone can start a new round. The payer covers rent for the new game state (~0.0017 SOL).`,
-      label: `Start Molt #${nextRound}`,
+      title: `FOMolt3D — Start Round #${nextRound}`,
+      description: `Round #${gs.round} has ended. Start the next round with ${carryOver} SOL carry-over from the previous pot. This is permissionless — anyone can start a new round. The payer covers rent for the new game state (~0.0017 SOL).`,
+      label: `Start Round #${nextRound}`,
       links: {
         actions: [
           {
-            label: `Start Molt #${nextRound}`,
+            label: `Start Round #${nextRound}`,
             href: `/api/actions/start-new-round`,
           },
         ],
@@ -125,7 +125,7 @@ export async function POST(request: Request) {
 
     if (phase === "active" || phase === "ending") {
       return NextResponse.json(
-        { error: "Molt is still active. A new round cannot be started yet." },
+        { error: "Round is still active. A new round cannot be started yet." },
         { status: 400, headers: ACTIONS_CORS_HEADERS }
       );
     }
@@ -148,7 +148,7 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         transaction: serialized,
-        message: `Start Molt #${newRound} with ${formatSol(gameState.nextRoundPot, 2)} SOL carry-over`,
+        message: `Start Round #${newRound} with ${formatSol(gameState.nextRoundPot, 2)} SOL carry-over`,
         lastValidBlockHeight,
       },
       { headers: ACTIONS_CORS_HEADERS }

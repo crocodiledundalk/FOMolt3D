@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
+import { useGameState } from "@/hooks/use-game-state";
 import { useGameEvents } from "@/hooks/use-game-events";
 import { ActivityItem } from "./activity-item";
 
@@ -9,25 +10,34 @@ const PAGE_SIZE = 25;
 
 export function ActivityFeed() {
   const { events, connected, error } = useGameEvents();
+  const { data: gameData } = useGameState();
   const { publicKey } = useWallet();
   const walletAddress = publicKey?.toBase58() ?? null;
   const [page, setPage] = useState(0);
 
+  const currentRound = gameData?.gameState.round ?? 0;
+
+  // Filter to current round only
+  const roundEvents = useMemo(
+    () => (currentRound > 0 ? events.filter((e) => e.round === currentRound) : events),
+    [events, currentRound]
+  );
+
   // Reset to page 0 when new events arrive (user is on first page)
-  const totalPages = Math.max(1, Math.ceil(events.length / PAGE_SIZE));
+  const totalPages = Math.max(1, Math.ceil(roundEvents.length / PAGE_SIZE));
 
   // Events are stored oldest-first; display newest-first via pagination
   const displayEvents = useMemo(() => {
-    const start = events.length - (page + 1) * PAGE_SIZE;
-    const end = events.length - page * PAGE_SIZE;
-    return events.slice(Math.max(0, start), end).reverse();
-  }, [events, page]);
+    const start = roundEvents.length - (page + 1) * PAGE_SIZE;
+    const end = roundEvents.length - page * PAGE_SIZE;
+    return roundEvents.slice(Math.max(0, start), end).reverse();
+  }, [roundEvents, page]);
 
   return (
     <section className="flex flex-col border-2 border-dashed border-border bg-bg-secondary">
       <div className="flex items-center justify-between border-b-2 border-dashed border-border px-4 py-3">
         <h2 className="text-sm font-bold uppercase tracking-[0.2em] text-text-secondary">
-          Activity Feed
+          Activity Feed{currentRound > 0 ? ` — Round #${currentRound}` : ""}
         </h2>
         <span
           className={`flex items-center gap-1.5 text-xs ${
@@ -66,7 +76,7 @@ export function ActivityFeed() {
           ))
         )}
       </div>
-      {events.length > PAGE_SIZE && (
+      {roundEvents.length > PAGE_SIZE && (
         <div className="flex items-center justify-between border-t border-dashed border-border px-4 py-2">
           <button
             onClick={() => setPage((p) => Math.min(p + 1, totalPages - 1))}

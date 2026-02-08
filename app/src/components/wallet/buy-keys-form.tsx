@@ -222,10 +222,10 @@ export function BuyKeysForm() {
             {!gameData
               ? "loading game state..."
               : gameData.phase === "ended"
-                ? "molt ended — claim your scraps"
+                ? "round ended — claim your scraps"
                 : gameData.phase === "claiming"
                   ? "winner claimed — harvest scraps"
-                  : "no active molt"}
+                  : "no active round"}
           </button>
         ) : (
           <button

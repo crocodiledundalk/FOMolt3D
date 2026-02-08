@@ -137,7 +137,7 @@ export function ClaimPanel() {
                 Harvest Scraps
               </h3>
               <p className="mt-1 text-xs text-text-secondary">
-                Molt has ended. Claim your accumulated dividend scraps.
+                Round has ended. Claim your accumulated dividend scraps.
               </p>
             </div>
             <button

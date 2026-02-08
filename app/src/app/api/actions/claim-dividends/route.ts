@@ -47,9 +47,9 @@ export async function GET(request: Request) {
         {
           type: "action",
           icon: `${iconUrl}/icon.png`,
-          title: "FOMolt3D — Molt Still Active",
-          description: `Molt #${state.round} is still active. You can claim scraps once the timer expires.`,
-          label: "Molt Active",
+          title: "FOMolt3D — Round Still Active",
+          description: `Round #${state.round} is still active. You can claim scraps once the timer expires.`,
+          label: "Round Active",
           disabled: true,
         },
         { headers: ACTIONS_CORS_HEADERS }
@@ -60,7 +60,7 @@ export async function GET(request: Request) {
       type: "action",
       icon: `${iconUrl}/icon.png`,
       title: "FOMolt3D — Harvest Your Scraps",
-      description: `Molt #${state.round} has ended. Harvest your accumulated scraps. Pot: ${formatSol(state.potLamports, 2)} SOL.`,
+      description: `Round #${state.round} has ended. Harvest your accumulated scraps. Pot: ${formatSol(state.potLamports, 2)} SOL.`,
       label: "Harvest Scraps",
       links: {
         actions: [

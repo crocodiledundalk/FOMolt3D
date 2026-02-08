@@ -43,9 +43,9 @@ export async function GET(request: Request) {
         {
           type: "action",
           icon: `${iconUrl}/icon.png`,
-          title: "FOMolt3D — Molt Still Active",
-          description: `Molt #${gs.round} is still active. The winner prize can only be claimed after the timer expires.`,
-          label: "Molt Active",
+          title: "FOMolt3D — Round Still Active",
+          description: `Round #${gs.round} is still active. The winner prize can only be claimed after the timer expires.`,
+          label: "Round Active",
           disabled: true,
         },
         { headers: ACTIONS_CORS_HEADERS }
@@ -58,7 +58,7 @@ export async function GET(request: Request) {
           type: "action",
           icon: `${iconUrl}/icon.png`,
           title: "FOMolt3D — Winner Already Claimed",
-          description: `The winner prize for molt #${gs.round} has already been claimed.`,
+          description: `The winner prize for round #${gs.round} has already been claimed.`,
           label: "Already Claimed",
           disabled: true,
         },
@@ -70,7 +70,7 @@ export async function GET(request: Request) {
       type: "action",
       icon: `${iconUrl}/icon.png`,
       title: `FOMolt3D — Claim Winner Prize: ${formatSol(gs.winnerPot, 2)} SOL`,
-      description: `Molt #${gs.round} has ended. If you are the last claw grabber, claim your ${formatSol(gs.winnerPot, 2)} SOL winner prize.`,
+      description: `Round #${gs.round} has ended. If you are the last claw grabber, claim your ${formatSol(gs.winnerPot, 2)} SOL winner prize.`,
       label: "Claim Winner Prize",
       links: {
         actions: [
@@ -137,7 +137,7 @@ export async function POST(request: Request) {
 
     if (phase === "active" || phase === "ending") {
       return NextResponse.json(
-        { error: "Molt is still active. Winner prize cannot be claimed yet." },
+        { error: "Round is still active. Winner prize cannot be claimed yet." },
         { status: 400, headers: ACTIONS_CORS_HEADERS }
       );
     }

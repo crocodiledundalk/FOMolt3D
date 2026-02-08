@@ -133,6 +133,9 @@ function HistoryContent({ onClose }: { onClose: () => void }) {
                   <span className={`shrink-0 px-2 py-0.5 text-xs font-bold ${badge.className}`}>
                     {badge.label}
                   </span>
+                  <span className="shrink-0 tabular-nums text-xs text-text-muted">
+                    R{e.round}
+                  </span>
                   <span className="tabular-nums">{formatSol(e.amount)} SOL</span>
                   {e.keys && <span className="tabular-nums text-text-muted">({e.keys} claws)</span>}
                   <span className="ml-auto tabular-nums text-xs text-text-muted">

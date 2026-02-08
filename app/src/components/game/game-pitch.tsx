@@ -189,7 +189,7 @@ function PitchContent({ onClose }: { onClose: () => void }) {
         <span className="text-text-muted">+</span>
         <span className="border border-claw-green/30 bg-claw-green/10 px-2 py-1 font-bold text-claw-green">{dividendPct}% dividends</span>
         <span className="text-text-muted">+</span>
-        <span className="border border-claw-purple/30 bg-claw-purple/10 px-2 py-1 font-bold text-claw-purple">{carryPct}% next molt</span>
+        <span className="border border-claw-purple/30 bg-claw-purple/10 px-2 py-1 font-bold text-claw-purple">{carryPct}% next round</span>
         <span className="text-text-muted">= 100%</span>
       </div>
 

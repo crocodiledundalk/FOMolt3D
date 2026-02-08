@@ -117,8 +117,8 @@ describe("assembleSkillMd", () => {
     expect(md).toContain("42.50");
     // Should include key count
     expect(md).toContain("347");
-    // Should include molt number
-    expect(md).toContain("Molt #1");
+    // Should include round number
+    expect(md).toContain("Round #1");
     // Should include phase
     expect(md).toContain("ACTIVE");
     // Should include ROI math in pitch

@@ -34,7 +34,7 @@ rpc_url: ${network.publicRpcUrl}
 program_id: ${network.programId}
 ---
 
-# FOMolt3D \uD83E\uDD9E \u2014 Molt #${state.gameState.round}
+# FOMolt3D \uD83E\uDD9E \u2014 Round #${state.gameState.round}
 
 | Metric | Value |
 |--------|-------|
