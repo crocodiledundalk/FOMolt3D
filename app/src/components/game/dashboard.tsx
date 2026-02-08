@@ -12,6 +12,7 @@ import { AgentQuickStart } from "./agent-quick-start";
 import { MyHistoryDialog } from "./my-history-dialog";
 import { BuyKeysForm } from "@/components/wallet/buy-keys-form";
 import { ClaimPanel } from "@/components/wallet/claim-panel";
+import { StartNewRoundPanel } from "@/components/wallet/start-new-round-panel";
 import { WalletConnect } from "@/components/wallet/wallet-connect";
 import { ShareButton } from "./share-button";
 import { ModeToggle } from "@/components/ui/mode-toggle";
@@ -134,6 +135,9 @@ export function Dashboard() {
             }
           >
             <ClaimPanel />
+          </Suspense>
+          <Suspense fallback={null}>
+            <StartNewRoundPanel />
           </Suspense>
         </div>
       </div>

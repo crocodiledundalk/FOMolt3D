@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import {
   getReadOnlyProgram,
   estimateDividend,
+  getGamePhase,
 } from "@/lib/sdk";
 import {
   getCachedGameRound,
@@ -27,7 +28,9 @@ export async function GET() {
     }
 
     const { round, gameState } = result;
-    const players = await getCachedLeaderboardPlayers(program, round);
+    const phase = getGamePhase(gameState);
+    const roundEnded = phase === "ended" || phase === "claiming";
+    const players = await getCachedLeaderboardPlayers(program, round, roundEnded);
 
     const playersWithDividend = players.map((p) => ({
       player: p,

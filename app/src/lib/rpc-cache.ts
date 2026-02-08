@@ -71,12 +71,30 @@ export async function getCachedGameRound(
  *
  * Same pattern as game round cache but with longer TTL since
  * leaderboard data is heavier to fetch (getProgramAccounts).
+ *
+ * When `roundEnded` is true, the cache is frozen for that round:
+ * no re-fetch will be attempted. This prevents claimed players
+ * (whose currentRound resets to 0) from vanishing off the
+ * leaderboard after the round ends.
  */
 export async function getCachedLeaderboardPlayers(
   program: Program<Fomolt3d>,
-  round: number
+  round: number,
+  roundEnded = false
 ): Promise<OnChainPlayerState[]> {
   const now = Date.now();
+
+  // If round has ended and we already have data for it, serve it
+  // indefinitely. The rankings are final — no new buys will change them,
+  // and re-fetching would lose players who have already claimed.
+  if (
+    roundEnded &&
+    leaderboardCache &&
+    leaderboardCache.data.round === round &&
+    leaderboardCache.data.players.length > 0
+  ) {
+    return leaderboardCache.data.players;
+  }
 
   // Return cached data if within TTL and same round
   if (
@@ -90,8 +108,19 @@ export async function getCachedLeaderboardPlayers(
   // TTL expired, different round, or no cache — fetch fresh
   try {
     const players = await fetchAllPlayersInRound(program, round);
-    leaderboardCache = { data: { round, players }, fetchedAt: now };
-    return players;
+    // Only update cache if we got a non-empty result, or if we had nothing before.
+    // This prevents an empty RPC result (all players claimed) from overwriting
+    // a good snapshot.
+    if (
+      players.length > 0 ||
+      !leaderboardCache ||
+      leaderboardCache.data.round !== round
+    ) {
+      leaderboardCache = { data: { round, players }, fetchedAt: now };
+    }
+    return leaderboardCache?.data.round === round
+      ? leaderboardCache.data.players
+      : players;
   } catch (err) {
     // RPC error — fall back to stale cache if same round
     if (leaderboardCache && leaderboardCache.data.round === round) {

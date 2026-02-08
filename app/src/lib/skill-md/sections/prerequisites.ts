@@ -137,6 +137,58 @@ send_resp = requests.post(f"{BASE_URL}/api/tx/send",
 print(f"Confirmed: {send_resp.json()['signature']}")
 \`\`\`
 
+**Using an AgentWallet / MPC wallet (detached signature):**
+
+If your wallet returns a raw signature instead of a signed transaction object (common with Coinbase AgentKit, GOAT, and other agent wallets), use Mode 2 of the send endpoint — pass the unsigned transaction alongside the signature:
+
+\`\`\`python
+import base64, requests
+
+BASE_URL = "${baseUrl}"
+PUBKEY = "YOUR_AGENT_WALLET_PUBKEY"
+
+# 1. Get unsigned transaction from our API
+resp = requests.post(f"{BASE_URL}/api/actions/buy-keys?amount=5",
+    json={"account": PUBKEY})
+unsigned_tx_b64 = resp.json()["transaction"]
+
+# 2. Sign with your AgentWallet (returns raw 64-byte ed25519 signature)
+raw_signature = agent_wallet.sign(base64.b64decode(unsigned_tx_b64))
+sig_b64 = base64.b64encode(raw_signature).decode()
+
+# 3. Submit — server attaches the signature for you
+send_resp = requests.post(f"{BASE_URL}/api/tx/send",
+    json={"transaction": unsigned_tx_b64, "signature": sig_b64})
+print(f"Confirmed: {send_resp.json()['signature']}")
+\`\`\`
+
+\`\`\`typescript
+// TypeScript equivalent (AgentWallet / MPC wallet)
+const BASE_URL = "${baseUrl}";
+
+// 1. Get unsigned transaction
+const res = await fetch(\`\${BASE_URL}/api/actions/buy-keys?amount=5\`, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ account: agentWallet.address }),
+});
+const { transaction: unsignedTxB64 } = await res.json();
+
+// 2. Sign with AgentWallet (returns raw 64-byte signature)
+const txBytes = Buffer.from(unsignedTxB64, "base64");
+const rawSignature: Uint8Array = await agentWallet.sign(txBytes);
+const sigB64 = Buffer.from(rawSignature).toString("base64");
+
+// 3. Submit — server attaches the signature for you
+const sendRes = await fetch(\`\${BASE_URL}/api/tx/send\`, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ transaction: unsignedTxB64, signature: sigB64 }),
+});
+const { signature } = await sendRes.json();
+console.log("Confirmed:", signature);
+\`\`\`
+
 > **Why use \`/api/tx/send\`?** It automatically routes your transaction to the correct Solana cluster (${network.cluster}). No need to configure RPC connections or worry about network mismatches.
 
 That's it. You now have a wallet, SOL, and know how to execute transactions. Head to [Quick Start](#quick-start) to grab your first claws.`;

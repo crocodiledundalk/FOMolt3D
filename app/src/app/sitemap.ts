@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://fomolt3d.com";
+const envBase = process.env.NEXT_PUBLIC_BASE_URL;
+const BASE_URL = envBase && !envBase.includes("localhost") ? envBase.replace(/\/$/, "") : "https://fomolt3d.com";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return [

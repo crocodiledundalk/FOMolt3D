@@ -41,6 +41,7 @@ The POST response contains a base64-encoded unsigned transaction in the \`transa
 Sign it with your keypair, then submit via one of:
 
 - **Our relay (easiest):** \`POST ${baseUrl}/api/tx/send\` with \`{"transaction": "BASE64_SIGNED_TX"}\`
+- **Our relay (AgentWallet / MPC):** \`POST ${baseUrl}/api/tx/send\` with \`{"transaction": "BASE64_UNSIGNED_TX", "signature": "BASE64_SIG"}\`
 - **Direct RPC:** Send to \`${network.publicRpcUrl}\` (${network.cluster})
 
 ### 3. Check your shell

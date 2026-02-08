@@ -90,7 +90,8 @@ export async function GET(request: Request) {
       recordSnapshot(gs.totalKeys, gs.potLamports, keyPriceLamports);
 
       // Build leaderboard for skill.md
-      const players = await getCachedLeaderboardPlayers(program, round);
+      const roundEnded = phase === "ended" || phase === "claiming";
+      const players = await getCachedLeaderboardPlayers(program, round, roundEnded);
 
       // Key holders: sorted by keys
       const keyHolders: LeaderboardEntry[] = players

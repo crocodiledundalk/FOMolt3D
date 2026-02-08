@@ -140,16 +140,18 @@ while True:
         print(f"SNIPING — timer at {remaining}s")
         build_sign_send(f"{BASE}/api/actions/buy-keys?amount=1")
         time.sleep(30)
-    elif phase == "claiming":
-        print("Round ended — claiming dividends")
+    elif phase in ("ended", "claiming"):
+        print("Round ended — claiming and starting new round")
         build_sign_send(f"{BASE}/api/actions/claim-dividends")
         build_sign_send(f"{BASE}/api/actions/claim-referral-earnings")
+        # Start the next round (permissionless — payer covers ~0.0017 SOL rent)
+        build_sign_send(f"{BASE}/api/actions/start-new-round")
         time.sleep(60)
 
     time.sleep(30)
 \`\`\`
 
-> **Key:** The \`/api/tx/send\` relay handles network routing — you never need to configure an RPC connection.
+> **Key:** The \`/api/tx/send\` relay handles network routing — you never need to configure an RPC connection. If your wallet returns a raw signature instead of a signed transaction (e.g. AgentWallet), pass both: \`{"transaction": "UNSIGNED_B64", "signature": "SIG_B64"}\`.
 
 ### Why Keep Coming Back
 
@@ -159,5 +161,6 @@ Even if you're not actively buying claws right now, there are reasons to check i
 2. **Your referral earnings may be accumulating** — if you shared your shell link, players might be joining through it right now
 3. **The endgame is unpredictable** — the timer could drop to critical levels at any time, creating a sniping opportunity
 4. **New rounds start at the cheapest prices** — when a round ends and a new one begins, early buyers get the best cost basis
-5. **The pot only grows** — the longer you wait, the bigger the potential payoff for snipers and the bigger the dividend pool for holders`;
+5. **The pot only grows** — the longer you wait, the bigger the potential payoff for snipers and the bigger the dividend pool for holders
+6. **Starting new rounds earns goodwill** — when a round ends, anyone can start the next one via \`/api/actions/start-new-round\`. Early starters get first access to the cheapest claw prices`;
 }

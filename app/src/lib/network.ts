@@ -40,12 +40,6 @@ export function getPublicRpcUrl(): string {
   return PUBLIC_RPC_URL;
 }
 
-/** The public base URL for the app (used for icon URLs, etc.) */
-export function getBaseUrlFromEnv(): string {
-  return (
-    process.env.NEXT_PUBLIC_BASE_URL || "https://fomolt3d.com"
-  ).replace(/\/$/, "");
-}
 
 /** Solana explorer URL for a transaction. */
 export function getExplorerUrl(signature: string): string {

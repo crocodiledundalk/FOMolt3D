@@ -73,7 +73,7 @@ const fakeProgram = {} as any;
 describe("rpc-cache", () => {
   beforeEach(() => {
     invalidateAllCaches();
-    vi.clearAllMocks();
+    vi.resetAllMocks();
   });
 
   describe("getCachedGameRound", () => {
@@ -232,6 +232,63 @@ describe("rpc-cache", () => {
 
       expect(result).toEqual(players2);
       expect(mockedFetchAllPlayers).toHaveBeenCalledTimes(2);
+    });
+
+    it("freezes cache when roundEnded is true — no re-fetch", async () => {
+      const players = [makePlayerState(10), makePlayerState(5)];
+      mockedFetchAllPlayers.mockResolvedValueOnce(players);
+
+      // First call populates the cache
+      await getCachedLeaderboardPlayers(fakeProgram, 1);
+      invalidateLeaderboardCache(); // expire TTL
+
+      // With roundEnded=true, should return cached data without re-fetching
+      const result = await getCachedLeaderboardPlayers(fakeProgram, 1, true);
+      expect(result).toEqual(players);
+      expect(mockedFetchAllPlayers).toHaveBeenCalledTimes(1); // no second call
+    });
+
+    it("frozen cache preserves players even after TTL expiry", async () => {
+      const fullPlayers = [makePlayerState(10), makePlayerState(5)];
+      const reducedPlayers = [makePlayerState(10)]; // one player claimed
+      mockedFetchAllPlayers
+        .mockResolvedValueOnce(fullPlayers)
+        .mockResolvedValueOnce(reducedPlayers);
+
+      // Populate with full data during active round
+      await getCachedLeaderboardPlayers(fakeProgram, 1);
+      invalidateLeaderboardCache(); // expire TTL
+
+      // Round ends — frozen cache should return the full snapshot
+      const result = await getCachedLeaderboardPlayers(fakeProgram, 1, true);
+      expect(result).toEqual(fullPlayers);
+      // Should NOT have fetched the reduced set
+      expect(mockedFetchAllPlayers).toHaveBeenCalledTimes(1);
+    });
+
+    it("does not freeze empty cache — falls through to fetch", async () => {
+      const players = [makePlayerState(3)];
+      mockedFetchAllPlayers.mockResolvedValueOnce(players);
+
+      // No prior cache — roundEnded=true should still fetch
+      const result = await getCachedLeaderboardPlayers(fakeProgram, 1, true);
+      expect(result).toEqual(players);
+      expect(mockedFetchAllPlayers).toHaveBeenCalledTimes(1);
+    });
+
+    it("does not overwrite good snapshot with empty RPC result", async () => {
+      const fullPlayers = [makePlayerState(10), makePlayerState(5)];
+      mockedFetchAllPlayers
+        .mockResolvedValueOnce(fullPlayers)
+        .mockResolvedValueOnce([]); // all claimed — empty result
+
+      // Populate cache
+      await getCachedLeaderboardPlayers(fakeProgram, 1);
+      invalidateLeaderboardCache();
+
+      // Without frozen flag, a re-fetch returns empty but should not overwrite
+      const result = await getCachedLeaderboardPlayers(fakeProgram, 1);
+      expect(result).toEqual(fullPlayers);
     });
   });
 

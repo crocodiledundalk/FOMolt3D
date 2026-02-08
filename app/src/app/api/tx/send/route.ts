@@ -5,15 +5,46 @@ import { Transaction, VersionedTransaction } from "@solana/web3.js";
 import { getConnection, PROGRAM_ID } from "@/lib/sdk";
 import { getExplorerUrl } from "@/lib/network";
 
+const SIGNATURE_LENGTH = 64;
+
+/**
+ * Attach an external signature to an unsigned transaction.
+ * Supports both legacy Transaction and VersionedTransaction.
+ * The signature is placed in the first slot (fee payer / signer).
+ */
+function attachSignature(txBytes: Uint8Array, sigBytes: Uint8Array): Uint8Array {
+  // Try VersionedTransaction first (our Blinks endpoints produce these)
+  try {
+    const vtx = VersionedTransaction.deserialize(txBytes);
+    vtx.signatures[0] = sigBytes;
+    return vtx.serialize();
+  } catch {
+    // Fall through to legacy
+  }
+
+  // Try legacy Transaction
+  const tx = Transaction.from(txBytes);
+  if (tx.signatures.length > 0 && tx.signatures[0].publicKey) {
+    tx.signatures[0].signature = Buffer.from(sigBytes);
+  }
+  return tx.serialize();
+}
+
 /**
  * POST /api/tx/send
  *
- * Accepts a signed transaction (base64), validates it references our program,
- * and forwards it to the correct RPC endpoint. This eliminates the need for
- * agents to know which Solana cluster/RPC to use.
+ * Accepts a transaction and forwards it to the correct RPC endpoint.
+ * This eliminates the need for agents to know which Solana cluster/RPC to use.
  *
- * Body: { "transaction": "<base64-encoded signed transaction>" }
- * Returns: { "signature": "<tx signature>" } or error.
+ * Supports two modes:
+ *
+ * **Mode 1 — Signed transaction (standard wallets):**
+ *   Body: { "transaction": "<base64-encoded signed transaction>" }
+ *
+ * **Mode 2 — Unsigned transaction + detached signature (AgentWallet / MPC wallets):**
+ *   Body: { "transaction": "<base64-encoded unsigned transaction>", "signature": "<base64-encoded 64-byte ed25519 signature>" }
+ *
+ * Returns: { "signature": "<tx signature>", "explorer": "<explorer url>" } or error.
  */
 export async function POST(request: Request) {
   try {
@@ -37,7 +68,7 @@ export async function POST(request: Request) {
     const txBase64 = body.transaction;
     if (!txBase64 || typeof txBase64 !== "string") {
       return NextResponse.json(
-        { error: "Missing or invalid 'transaction' field. Expected a base64-encoded signed transaction." },
+        { error: "Missing or invalid 'transaction' field. Expected a base64-encoded transaction." },
         { status: 400 }
       );
     }
@@ -51,6 +82,43 @@ export async function POST(request: Request) {
         { error: "Could not decode base64 transaction." },
         { status: 400 }
       );
+    }
+
+    // Mode 2: If a detached signature is provided, attach it to the unsigned transaction
+    const sigBase64 = body.signature;
+    if (sigBase64 !== undefined) {
+      if (typeof sigBase64 !== "string") {
+        return NextResponse.json(
+          { error: "Invalid 'signature' field. Expected a base64-encoded ed25519 signature (64 bytes)." },
+          { status: 400 }
+        );
+      }
+
+      let sigBytes: Buffer;
+      try {
+        sigBytes = Buffer.from(sigBase64, "base64");
+      } catch {
+        return NextResponse.json(
+          { error: "Could not decode base64 signature." },
+          { status: 400 }
+        );
+      }
+
+      if (sigBytes.length !== SIGNATURE_LENGTH) {
+        return NextResponse.json(
+          { error: `Invalid signature length: expected ${SIGNATURE_LENGTH} bytes, got ${sigBytes.length}. Provide a raw ed25519 signature, not a transaction.` },
+          { status: 400 }
+        );
+      }
+
+      try {
+        txBytes = Buffer.from(attachSignature(txBytes, sigBytes));
+      } catch {
+        return NextResponse.json(
+          { error: "Failed to attach signature to transaction. Ensure the transaction is a valid unsigned Solana transaction." },
+          { status: 400 }
+        );
+      }
     }
 
     // Try to deserialize as legacy Transaction first, then VersionedTransaction

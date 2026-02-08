@@ -15,11 +15,11 @@ import {
 import { getCachedGameRound } from "@/lib/rpc-cache";
 import { formatSol } from "@/lib/utils/format";
 import { ACTIONS_CORS_HEADERS, actionsOptions } from "@/lib/actions-headers";
-import { getBaseUrlFromEnv } from "@/lib/network";
+import { getBaseUrl } from "@/lib/base-url";
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    const iconUrl = getBaseUrlFromEnv();
+    const iconUrl = getBaseUrl(request);
     const program = getReadOnlyProgram();
     const result = await getCachedGameRound(program);
 
