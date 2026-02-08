@@ -3,6 +3,7 @@
 import { useState, useCallback } from "react";
 import { Transaction } from "@solana/web3.js";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+import { getComputeBudgetInstructions, ComputeUnits } from "@/lib/priority-fees";
 import { useQueryClient } from "@tanstack/react-query";
 import { useGameState } from "@/hooks/use-game-state";
 import { usePlayerState } from "@/hooks/use-player-state";
@@ -70,7 +71,8 @@ export function ClaimPanel() {
         return;
       }
 
-      const tx = new Transaction().add(...ixs);
+      const budgetIxs = await getComputeBudgetInstructions(connection, ComputeUnits.CLAIM);
+      const tx = new Transaction().add(...budgetIxs, ...ixs);
       tx.feePayer = publicKey;
       tx.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
 

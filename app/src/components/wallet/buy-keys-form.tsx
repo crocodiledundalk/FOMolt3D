@@ -3,6 +3,7 @@
 import { useState, useCallback } from "react";
 import { PublicKey, Transaction } from "@solana/web3.js";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+import { getComputeBudgetInstructions, ComputeUnits } from "@/lib/priority-fees";
 import { useQueryClient } from "@tanstack/react-query";
 import { useGameState } from "@/hooks/use-game-state";
 import { usePlayerState } from "@/hooks/use-player-state";
@@ -102,7 +103,8 @@ export function BuyKeysForm() {
         return;
       }
 
-      const tx = new Transaction().add(...instructions);
+      const budgetIxs = await getComputeBudgetInstructions(connection, ComputeUnits.BUY_KEYS);
+      const tx = new Transaction().add(...budgetIxs, ...instructions);
       tx.feePayer = publicKey;
       tx.recentBlockhash = (
         await connection.getLatestBlockhash()

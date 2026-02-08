@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Transaction } from "@solana/web3.js";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+import { getComputeBudgetInstructions, ComputeUnits } from "@/lib/priority-fees";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import type { Program } from "@coral-xyz/anchor";
 import type { Fomolt3d } from "@/lib/idl-types";
@@ -85,7 +86,8 @@ export function RoundPanel({ program }: RoundPanelProps) {
     setSubmitting(true);
     try {
       const ix = await buildInitializeFirstRound(program, publicKey);
-      const tx = new Transaction().add(ix);
+      const budgetIxs = await getComputeBudgetInstructions(connection, ComputeUnits.INIT_ROUND);
+      const tx = new Transaction().add(...budgetIxs, ix);
       tx.feePayer = publicKey;
       tx.recentBlockhash = (
         await connection.getLatestBlockhash()
@@ -116,7 +118,8 @@ export function RoundPanel({ program }: RoundPanelProps) {
         round,
         round + 1
       );
-      const tx = new Transaction().add(ix);
+      const budgetIxs = await getComputeBudgetInstructions(connection, ComputeUnits.START_NEW_ROUND);
+      const tx = new Transaction().add(...budgetIxs, ix);
       tx.feePayer = publicKey;
       tx.recentBlockhash = (
         await connection.getLatestBlockhash()

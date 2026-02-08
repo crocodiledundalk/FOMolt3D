@@ -9,6 +9,7 @@ import {
   estimateBuyCost,
 } from "@/lib/sdk";
 import { getCachedGameRound } from "@/lib/rpc-cache";
+import { getComputeBudgetInstructions, ComputeUnits } from "@/lib/priority-fees";
 
 export async function POST(request: Request) {
   try {
@@ -73,8 +74,9 @@ export async function POST(request: Request) {
       );
     }
 
+    const budgetIxs = await getComputeBudgetInstructions(connection, ComputeUnits.BUY_KEYS);
     const tx = new Transaction();
-    tx.add(...ixs);
+    tx.add(...budgetIxs, ...ixs);
     tx.feePayer = buyer;
     const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash();
     tx.recentBlockhash = blockhash;

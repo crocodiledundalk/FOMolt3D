@@ -16,6 +16,7 @@ import { getCachedGameRound } from "@/lib/rpc-cache";
 import { formatSol } from "@/lib/utils/format";
 import { ACTIONS_CORS_HEADERS, actionsOptions } from "@/lib/actions-headers";
 import { getBaseUrl } from "@/lib/base-url";
+import { getComputeBudgetInstructions, ComputeUnits } from "@/lib/priority-fees";
 
 export async function GET(request: Request) {
   try {
@@ -134,8 +135,9 @@ export async function POST(request: Request) {
       );
     }
 
+    const budgetIxs = await getComputeBudgetInstructions(connection, ComputeUnits.CLAIM);
     const tx = new Transaction();
-    tx.add(...ixs);
+    tx.add(...budgetIxs, ...ixs);
     tx.feePayer = player;
     const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash();
     tx.recentBlockhash = blockhash;

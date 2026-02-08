@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Transaction } from "@solana/web3.js";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+import { getComputeBudgetInstructions, ComputeUnits } from "@/lib/priority-fees";
 import { useQueryClient } from "@tanstack/react-query";
 import { useGameState } from "@/hooks/use-game-state";
 import { useAnchorProgram } from "@/hooks/use-anchor-program";
@@ -38,7 +39,8 @@ export function StartNewRoundPanel() {
         gameState.round,
         nextRound
       );
-      const tx = new Transaction().add(ix);
+      const budgetIxs = await getComputeBudgetInstructions(connection, ComputeUnits.START_NEW_ROUND);
+      const tx = new Transaction().add(...budgetIxs, ix);
       tx.feePayer = publicKey;
       tx.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
 

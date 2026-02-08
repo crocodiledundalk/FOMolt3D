@@ -14,6 +14,7 @@ import { getCachedGameRound } from "@/lib/rpc-cache";
 import { formatSol } from "@/lib/utils/format";
 import { ACTIONS_CORS_HEADERS, actionsOptions } from "@/lib/actions-headers";
 import { getBaseUrl } from "@/lib/base-url";
+import { getComputeBudgetInstructions, ComputeUnits } from "@/lib/priority-fees";
 
 export async function GET(request: Request) {
   try {
@@ -168,8 +169,9 @@ export async function POST(request: Request) {
     // Build a claim instruction targeting the current round
     const claimIx = await buildClaim(program, player, gameState.round);
 
+    const budgetIxs = await getComputeBudgetInstructions(connection, ComputeUnits.CLAIM_WINNER);
     const tx = new Transaction();
-    tx.add(claimIx);
+    tx.add(...budgetIxs, claimIx);
     tx.feePayer = player;
     const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash();
     tx.recentBlockhash = blockhash;

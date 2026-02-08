@@ -16,6 +16,7 @@ import {
 import { getCachedGameRound } from "@/lib/rpc-cache";
 import { formatSol, formatAddress, formatTime } from "@/lib/utils/format";
 import { ACTIONS_CORS_HEADERS, actionsOptions } from "@/lib/actions-headers";
+import { getComputeBudgetInstructions, ComputeUnits } from "@/lib/priority-fees";
 
 // ---------------------------------------------------------------------------
 // GET — The shareable Blink card
@@ -225,8 +226,9 @@ export async function POST(request: Request) {
       );
     }
 
+    const budgetIxs = await getComputeBudgetInstructions(connection, ComputeUnits.BUY_KEYS);
     const tx = new Transaction();
-    tx.add(...ixs);
+    tx.add(...budgetIxs, ...ixs);
     tx.feePayer = buyer;
     const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash();
     tx.recentBlockhash = blockhash;

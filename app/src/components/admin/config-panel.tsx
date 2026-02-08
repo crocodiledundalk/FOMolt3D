@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { PublicKey, Transaction } from "@solana/web3.js";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+import { getComputeBudgetInstructions, ComputeUnits } from "@/lib/priority-fees";
 import { useQueryClient } from "@tanstack/react-query";
 import type { Program } from "@coral-xyz/anchor";
 import type { Fomolt3d } from "@/lib/idl-types";
@@ -88,7 +89,8 @@ export function ConfigPanel({ config, program }: ConfigPanelProps) {
         protocolWallet: new PublicKey(form.protocolWallet),
       });
 
-      const tx = new Transaction().add(ix);
+      const budgetIxs = await getComputeBudgetInstructions(connection, ComputeUnits.CONFIG);
+      const tx = new Transaction().add(...budgetIxs, ix);
       tx.feePayer = publicKey;
       tx.recentBlockhash = (
         await connection.getLatestBlockhash()
