@@ -3,6 +3,7 @@ export const API_ROUTES = {
   PLAYER: (address: string) => `/api/player/${address}`,
   LEADERBOARD: "/api/leaderboard",
   EVENTS: "/api/events",
+  EVENTS_RECENT: "/api/events/recent",
 
   REFERRAL_CREATE: "/api/referral/create",
   TX_BUY: "/api/tx/buy",
