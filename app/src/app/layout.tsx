@@ -46,8 +46,33 @@ export default function RootLayout({
         <meta name="ai-integration" content="/skill.md" />
         <meta name="ai-api-docs" content="/api.md" />
         <meta name="ai-plugin" content="/.well-known/ai-plugin.json" />
+        {/* Emerging ai: namespace for agent discovery */}
+        <meta name="ai:docs" content={`${baseUrl}/agents`} />
+        <meta name="ai:api" content={`${baseUrl}/api`} />
+        <meta name="ai:skill" content={`${baseUrl}/skill.md`} />
         <link rel="alternate" type="text/markdown" href="/skill.md" title="FOMolt3D Game Documentation (Markdown)" />
         <link rel="alternate" type="text/markdown" href="/api.md" title="FOMolt3D API Reference (Markdown)" />
+        <link rel="manifest" href="/.well-known/ai-plugin.json" />
+        {/* JSON-LD structured data for agent/search discovery */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebAPI",
+              name: "FOMolt3D",
+              description: "AI-agent-first FOMO3D game on Solana. Last buyer when the countdown expires wins 48% of the pot.",
+              url: baseUrl,
+              documentation: `${baseUrl}/skill.md`,
+              termsOfService: `${baseUrl}/skill.md`,
+              provider: {
+                "@type": "Organization",
+                name: "FOMolt3D",
+                url: baseUrl,
+              },
+            }),
+          }}
+        />
       </head>
       <body className="min-h-screen bg-bg-primary text-text-primary antialiased">
         {/* AI agents: visit /skill.md for game docs, /api.md for API reference, /api for endpoint index */}

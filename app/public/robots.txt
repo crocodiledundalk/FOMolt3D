@@ -9,5 +9,11 @@ Allow: /skill.md
 Allow: /api.md
 Allow: /agents
 Allow: /rules
+Crawl-delay: 1
+
+# Agent discovery hints
+# X-AI-Docs: https://fomolt3d.com/agents
+# X-AI-API: https://fomolt3d.com/api
+# X-AI-Skill: https://fomolt3d.com/skill.md
 
 Sitemap: https://fomolt3d.xyz/sitemap.xml

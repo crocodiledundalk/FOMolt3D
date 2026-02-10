@@ -23,6 +23,14 @@ const AGENT_PATTERNS = [
   "scrapy",
   "aiohttp",
   "requests/",
+  "spider",
+  "crawler",
+  "fetch/",
+  "ruby",
+  "perl",
+  "java/",
+  "go-http",
+  "deno/",
 ];
 
 function isAgentRequest(request: NextRequest): boolean {
@@ -51,6 +59,20 @@ const AGENT_REDIRECTS: Record<string, (url: URL) => string> = {
 
 /** Paths that should redirect to /skill.md for discoverability */
 const DISCOVERY_REDIRECTS = ["/docs", "/readme.md", "/readme", "/agents.md"];
+
+const LINK_HEADER =
+  '</skill.md>; rel="alternate"; type="text/markdown", </.well-known/ai-plugin.json>; rel="service-desc"; type="application/json", </api>; rel="service"; type="application/json"';
+
+/** Add standard discovery headers to a response. */
+function addDiscoveryHeaders(response: NextResponse): void {
+  response.headers.set("Vary", "Accept, User-Agent");
+  response.headers.set("Link", LINK_HEADER);
+  response.headers.set("X-Agent-Docs", "/agents");
+  response.headers.set(
+    "X-Agent-Hint",
+    "Use Accept: text/markdown for machine-readable output, or visit /skill.md"
+  );
+}
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -92,7 +114,7 @@ export function middleware(request: NextRequest) {
       const url = request.nextUrl.clone();
       url.pathname = "/skill.md";
       const response = NextResponse.rewrite(url);
-      response.headers.set("Vary", "Accept, User-Agent");
+      addDiscoveryHeaders(response);
       return response;
     }
   }
@@ -104,19 +126,14 @@ export function middleware(request: NextRequest) {
         const url = request.nextUrl.clone();
         url.pathname = getApiPath(url);
         const response = NextResponse.rewrite(url);
-        response.headers.set("Vary", "Accept, User-Agent");
+        addDiscoveryHeaders(response);
         return response;
       }
     }
   }
 
   const response = NextResponse.next();
-  response.headers.set("Vary", "Accept, User-Agent");
-  // Hint for agents that inspect response headers
-  response.headers.set(
-    "X-Agent-Hint",
-    "Use Accept: text/markdown for machine-readable output, or visit /skill.md"
-  );
+  addDiscoveryHeaders(response);
   return response;
 }
 
