@@ -3,7 +3,7 @@
 
   "network": {
     "cluster": "mainnet-beta",
-    "rpc_url": "YOUR_MAINNET_RPC_URL_HERE",
+    "rpc_url": "https://api.mainnet-beta.solana.com",
     "_rpc_note": "Use a paid RPC provider (Helius, Triton, QuickNode). Public mainnet RPCs are rate-limited and unreliable."
   },
 
@@ -14,52 +14,52 @@
   },
 
   "authority": {
-    "deployer_keypair": "~/.config/solana/id.json",
-    "new_upgrade_authority": "YOUR_MULTISIG_OR_COLD_WALLET_HERE",
+    "deployer_keypair": "/Users/Cian/Desktop/FOMolt3D/deployer/deployer.json",
+    "new_upgrade_authority": "6FChboHL9PNxvFUx4BN3VE2KoLKyTVNqW6m6i6aRzQFu",
     "_authority_note": "Transfer program upgrade authority to this address after deployment. Use a multisig (e.g., Squads) for production."
   },
 
   "game_parameters": {
-    "base_price_lamports": 10000000,
-    "base_price_sol": "0.01 SOL",
-    "price_increment_lamports": 1000000,
-    "price_increment_sol": "0.001 SOL per key sold",
-    "timer_extension_secs": 30,
+    "base_price_lamports": 5000000,
+    "base_price_sol": "0.005 SOL",
+    "price_increment_lamports": 100000,
+    "price_increment_sol": "0.0001 SOL per key sold",
+    "timer_extension_secs": 60,
     "max_timer_secs": 86400,
     "max_timer_human": "24 hours",
     "_pricing_note": "Review bonding curve parameters carefully. These cannot be changed after round starts (only via config update between rounds)."
   },
 
   "fee_splits": {
-    "winner_bps": 4800,
-    "winner_pct": "48%",
-    "dividend_bps": 4500,
-    "dividend_pct": "45%",
+    "winner_bps": 5000,
+    "winner_pct": "50%",
+    "dividend_bps": 4300,
+    "dividend_pct": "43%",
     "next_round_bps": 700,
     "next_round_pct": "7%",
     "_pot_total": "winner + dividend + next_round = 10000 bps (100%)",
-    "protocol_fee_bps": 200,
-    "protocol_fee_pct": "2% of each purchase (house edge, deducted before pot)",
+    "protocol_fee_bps": 500,
+    "protocol_fee_pct": "5% of each purchase (house edge, deducted before pot)",
     "referral_bonus_bps": 1000,
     "referral_bonus_pct": "10% of after-fee amount (paid from buyer cost, not pot)"
   },
 
   "wallets": {
-    "protocol_wallet": "YOUR_PROTOCOL_FEE_WALLET_HERE",
-    "_protocol_wallet_note": "Receives the 2% protocol fee from every key purchase. Use a dedicated wallet, not the deployer."
+    "protocol_wallet": "DwkLt9DMsLM1VRBJL3BnB2GsgLA8iREncXdNzde8RmBB",
+    "_protocol_wallet_note": "Receives the 5% protocol fee from every key purchase. Use a dedicated wallet, not the deployer."
   },
 
   "app": {
-    "base_url": "YOUR_PRODUCTION_DOMAIN_HERE",
-    "next_public_rpc_url": "YOUR_PUBLIC_RPC_URL_HERE",
+    "base_url": "https://fomolt3d.com",
+    "next_public_rpc_url": "https://api.mainnet-beta.solana.com",
     "_public_rpc_note": "This is exposed to browsers. Use a separate public endpoint or the same paid RPC with rate limiting."
   },
 
   "priority_fees": {
     "enabled": true,
     "strategy": "dynamic",
-    "fallback_micro_lamports": 50000,
-    "max_micro_lamports": 1000000,
+    "fallback_micro_lamports": 20000,
+    "max_micro_lamports": 100000,
     "_note": "Dynamic strategy fetches recent prioritization fees. Fallback used when RPC estimate unavailable. Max caps overpayment."
   }
 }

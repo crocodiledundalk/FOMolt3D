@@ -236,6 +236,7 @@ export async function POST(request: Request) {
     const serialized = tx
       .serialize({ requireAllSignatures: false })
       .toString("base64");
+    const signData = tx.serializeMessage().toString("base64");
 
     const estimate = estimateBuyCost(gameState, amount, false);
 
@@ -243,6 +244,7 @@ export async function POST(request: Request) {
       {
         type: "transaction",
         transaction: serialized,
+        signData,
         message: `Grabbing ${amount} claw${amount > 1 ? "s" : ""} for ~${formatSol(estimate.totalCost)} SOL`,
         lastValidBlockHeight,
         links: {

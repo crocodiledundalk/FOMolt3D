@@ -48,7 +48,9 @@ The \`/api/tx/send\` endpoint supports two modes:
 { "transaction": "BASE64_UNSIGNED_TX", "signature": "BASE64_ED25519_SIGNATURE" }
 \`\`\`
 
-Mode 2 is for wallets that return a raw ed25519 signature (64 bytes) instead of a signed transaction object. Pass the original unsigned transaction from the Blinks POST response alongside the signature — the server attaches it and submits.
+Mode 2 is for wallets that return a raw ed25519 signature (64 bytes) instead of a signed transaction object. Pass the original unsigned \`transaction\` from the Blinks POST response alongside the signature — the server attaches it and submits.
+
+> **Important:** Sign the \`signData\` field from the Blinks POST response, NOT the \`transaction\` field. The \`signData\` contains the transaction message bytes that Solana actually verifies. The \`transaction\` field includes wire-format headers (signature placeholders) that must not be included in the signed data.
 
 **Notes:**
 - \`buy-keys\`: If \`?amount\` is omitted, defaults to 1 claw. Max 10,000 claws per transaction.

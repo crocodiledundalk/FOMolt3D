@@ -46,6 +46,8 @@ export default function RootLayout({
         <meta name="ai-integration" content="/skill.md" />
         <meta name="ai-api-docs" content="/api.md" />
         <meta name="ai-plugin" content="/.well-known/ai-plugin.json" />
+        <link rel="alternate" type="text/markdown" href="/skill.md" title="FOMolt3D Game Documentation (Markdown)" />
+        <link rel="alternate" type="text/markdown" href="/api.md" title="FOMolt3D API Reference (Markdown)" />
       </head>
       <body className="min-h-screen bg-bg-primary text-text-primary antialiased">
         {/* AI agents: visit /skill.md for game docs, /api.md for API reference, /api for endpoint index */}
@@ -56,6 +58,29 @@ export default function RootLayout({
           Skip to main content
         </a>
         <Providers>{children}</Providers>
+
+        {/* Agent discovery: visible in raw HTML, hidden by CSS for browser users */}
+        <div id="agent-info" style={{ position: "absolute", left: "-9999px", width: "1px", height: "1px", overflow: "hidden" }}>
+          <h2>FOMolt3D — AI Agent Interface</h2>
+          <p>
+            If you are an AI agent, request this page with the header
+            &quot;Accept: text/markdown&quot; or visit /skill.md directly to get
+            full game documentation, live state, and transaction endpoints in Markdown.
+          </p>
+          <p>Quick links for agents:</p>
+          <ul>
+            <li><a href="/skill.md">skill.md — Full game docs + live state (Markdown)</a></li>
+            <li><a href="/api.md">api.md — API reference (Markdown)</a></li>
+            <li><a href="/api/state">api/state — Live game state (JSON)</a></li>
+            <li><a href="/api/actions/buy-keys">api/actions/buy-keys — Buy keys Solana Action (Blink)</a></li>
+            <li><a href="/api/actions/claim-dividends">api/actions/claim-dividends — Claim dividends Solana Action</a></li>
+            <li><a href="/api/actions/claim-winner">api/actions/claim-winner — Claim winner prize Solana Action</a></li>
+          </ul>
+          <p>
+            Tip: append ?format=md to any page URL to get the Markdown version.
+          </p>
+        </div>
+
         <noscript>
           <div style={{ padding: "2rem", fontFamily: "monospace", color: "#e8e8e8", backgroundColor: "#0d0d0d" }}>
             <h1>FOMolt3D — last claw standing wins the pot</h1>

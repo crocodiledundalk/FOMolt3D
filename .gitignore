@@ -30,5 +30,4 @@ app/.next/
 *.json.bak
 keypair*.json
 deploy-keypair*.json
-
-
+/deployer

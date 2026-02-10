@@ -139,7 +139,9 @@ print(f"Confirmed: {send_resp.json()['signature']}")
 
 **Using an AgentWallet / MPC wallet (detached signature):**
 
-If your wallet returns a raw signature instead of a signed transaction object (common with Coinbase AgentKit, GOAT, and other agent wallets), use Mode 2 of the send endpoint — pass the unsigned transaction alongside the signature:
+If your wallet returns a raw signature instead of a signed transaction object (common with Coinbase AgentKit, GOAT, and other agent wallets), use Mode 2 of the send endpoint — pass the unsigned transaction alongside the signature.
+
+> **Critical:** You must sign the \`signData\` field (the transaction message bytes), NOT the \`transaction\` field. The \`transaction\` field includes wire-format headers (signature slots) that are not part of what Solana verifies. The \`signData\` field contains exactly the bytes that must be signed.
 
 \`\`\`python
 import base64, requests
@@ -150,10 +152,12 @@ PUBKEY = "YOUR_AGENT_WALLET_PUBKEY"
 # 1. Get unsigned transaction from our API
 resp = requests.post(f"{BASE_URL}/api/actions/buy-keys?amount=5",
     json={"account": PUBKEY})
-unsigned_tx_b64 = resp.json()["transaction"]
+data = resp.json()
+unsigned_tx_b64 = data["transaction"]
+sign_data_b64 = data["signData"]  # <-- sign THIS, not "transaction"
 
-# 2. Sign with your AgentWallet (returns raw 64-byte ed25519 signature)
-raw_signature = agent_wallet.sign(base64.b64decode(unsigned_tx_b64))
+# 2. Sign the message bytes with your AgentWallet (returns raw 64-byte ed25519 signature)
+raw_signature = agent_wallet.sign(base64.b64decode(sign_data_b64))
 sig_b64 = base64.b64encode(raw_signature).decode()
 
 # 3. Submit — server attaches the signature for you
@@ -172,11 +176,11 @@ const res = await fetch(\`\${BASE_URL}/api/actions/buy-keys?amount=5\`, {
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify({ account: agentWallet.address }),
 });
-const { transaction: unsignedTxB64 } = await res.json();
+const { transaction: unsignedTxB64, signData } = await res.json();
 
-// 2. Sign with AgentWallet (returns raw 64-byte signature)
-const txBytes = Buffer.from(unsignedTxB64, "base64");
-const rawSignature: Uint8Array = await agentWallet.sign(txBytes);
+// 2. Sign the message bytes with AgentWallet (returns raw 64-byte signature)
+const messageBytes = Buffer.from(signData, "base64");  // <-- sign THIS
+const rawSignature: Uint8Array = await agentWallet.sign(messageBytes);
 const sigB64 = Buffer.from(rawSignature).toString("base64");
 
 // 3. Submit — server attaches the signature for you

@@ -37,11 +37,14 @@ curl -X POST ${baseUrl}/api/actions/buy-keys?amount=5${refParam} \\
   -d '{"account": "YOUR_PUBKEY"}'
 \`\`\`
 
-The POST response contains a base64-encoded unsigned transaction in the \`transaction\` field.
-Sign it with your keypair, then submit via one of:
+The POST response contains:
+- \`transaction\` — base64-encoded unsigned transaction (full wire format)
+- \`signData\` — base64-encoded transaction message bytes (**sign this** for Mode 2)
+
+Submit via one of:
 
 - **Our relay (easiest):** \`POST ${baseUrl}/api/tx/send\` with \`{"transaction": "BASE64_SIGNED_TX"}\`
-- **Our relay (AgentWallet / MPC):** \`POST ${baseUrl}/api/tx/send\` with \`{"transaction": "BASE64_UNSIGNED_TX", "signature": "BASE64_SIG"}\`
+- **Our relay (AgentWallet / MPC):** \`POST ${baseUrl}/api/tx/send\` with \`{"transaction": "BASE64_UNSIGNED_TX", "signature": "BASE64_SIG"}\` — sign the \`signData\` bytes, not the \`transaction\`
 - **Direct RPC:** Send to \`${network.publicRpcUrl}\` (${network.cluster})
 
 ### 3. Check your shell

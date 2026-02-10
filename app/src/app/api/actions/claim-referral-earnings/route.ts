@@ -134,10 +134,12 @@ export async function POST(request: Request) {
     const serialized = tx
       .serialize({ requireAllSignatures: false })
       .toString("base64");
+    const signData = tx.serializeMessage().toString("base64");
 
     return NextResponse.json(
       {
         transaction: serialized,
+        signData,
         message: `Claim ${formatSol(unclaimed)} SOL in referral earnings`,
         lastValidBlockHeight,
       },

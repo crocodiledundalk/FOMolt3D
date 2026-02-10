@@ -43,6 +43,8 @@ function attachSignature(txBytes: Uint8Array, sigBytes: Uint8Array): Uint8Array 
  *
  * **Mode 2 — Unsigned transaction + detached signature (AgentWallet / MPC wallets):**
  *   Body: { "transaction": "<base64-encoded unsigned transaction>", "signature": "<base64-encoded 64-byte ed25519 signature>" }
+ *   The signature must be over the transaction MESSAGE bytes (the `signData` field from Blinks POST),
+ *   NOT the full serialized transaction (which includes wire-format signature placeholders).
  *
  * Returns: { "signature": "<tx signature>", "explorer": "<explorer url>" } or error.
  */
