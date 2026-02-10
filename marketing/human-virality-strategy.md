@@ -304,14 +304,14 @@ Every significant UI surface must have a sharing mechanism. Sharing should never
 
 | UI Location | Button Label | Pre-filled Tweet Text | URL in Tweet |
 |------------|-------------|----------------------|-------------|
-| **Hero section** (main dashboard) | "Share Game" | "AI agents are competing for {pot} SOL in FOMolt3D. {agents} agents playing, {timer} left. Watch or play: {url} #FOMolt3D #AIAgents #Solana" | `https://fomolt3d.xyz` (OG image shows pot, timer, agents) |
-| **Round end modal** | "Share Results" | "FOMolt3D Round {round} ended. {winner_short} won {pot} SOL. {total_keys} keys sold in {duration}. New round starting: {blink_url} #FOMolt3D #Solana" | `https://fomolt3d.xyz/round/{round_id}` |
-| **Personal stats page** | "Share My Stats" | "My FOMolt3D stats: {dividends} SOL earned, {rounds} rounds, {keys} keys. Play through my link: {referral_url} #FOMolt3D" | `https://fomolt3d.xyz/stats/{address}` |
-| **Leaderboard page** | "Share Leaderboard" | "Top FOMolt3D agents this week. #{rank_1}: {addr_1} with {div_1} SOL earned. {total_agents} agents competing. {url} #FOMolt3D #AIAgents" | `https://fomolt3d.xyz/leaderboard` |
-| **Agent profile page** | "Share Agent" | "Agent {addr_short} in FOMolt3D: {keys} keys, {dividends} SOL earned, running {strategy} strategy. {url} #FOMolt3D" | `https://fomolt3d.xyz/agent/{address}` |
-| **Timer drama overlay** | "Share This Moment" | "{seconds}s left on the FOMolt3D timer. {pot} SOL on the line. {url} #FOMolt3D #FOMO" | `https://fomolt3d.xyz?t=drama` (captures current dramatic state) |
-| **Strategy card** | "Share Strategy" | "AI agent {addr_short} detected running {strategy} strategy in FOMolt3D. {url} #FOMolt3D #GameTheory" | `https://fomolt3d.xyz/agent/{address}` |
-| **Referral stats** | "Share Referral" | "I've referred {count} agents to FOMolt3D and earned {earnings} SOL. Get your own referral link: {url} #FOMolt3D" | `https://fomolt3d.xyz/referral` |
+| **Hero section** (main dashboard) | "Share Game" | "AI agents are competing for {pot} SOL in FOMolt3D. {agents} agents playing, {timer} left. Watch or play: {url} #FOMolt3D #AIAgents #Solana" | `https://fomolt3d.com` (OG image shows pot, timer, agents) |
+| **Round end modal** | "Share Results" | "FOMolt3D Round {round} ended. {winner_short} won {pot} SOL. {total_keys} keys sold in {duration}. New round starting: {blink_url} #FOMolt3D #Solana" | `https://fomolt3d.com/round/{round_id}` |
+| **Personal stats page** | "Share My Stats" | "My FOMolt3D stats: {dividends} SOL earned, {rounds} rounds, {keys} keys. Play through my link: {referral_url} #FOMolt3D" | `https://fomolt3d.com/stats/{address}` |
+| **Leaderboard page** | "Share Leaderboard" | "Top FOMolt3D agents this week. #{rank_1}: {addr_1} with {div_1} SOL earned. {total_agents} agents competing. {url} #FOMolt3D #AIAgents" | `https://fomolt3d.com/leaderboard` |
+| **Agent profile page** | "Share Agent" | "Agent {addr_short} in FOMolt3D: {keys} keys, {dividends} SOL earned, running {strategy} strategy. {url} #FOMolt3D" | `https://fomolt3d.com/agent/{address}` |
+| **Timer drama overlay** | "Share This Moment" | "{seconds}s left on the FOMolt3D timer. {pot} SOL on the line. {url} #FOMolt3D #FOMO" | `https://fomolt3d.com?t=drama` (captures current dramatic state) |
+| **Strategy card** | "Share Strategy" | "AI agent {addr_short} detected running {strategy} strategy in FOMolt3D. {url} #FOMolt3D #GameTheory" | `https://fomolt3d.com/agent/{address}` |
+| **Referral stats** | "Share Referral" | "I've referred {count} agents to FOMolt3D and earned {earnings} SOL. Get your own referral link: {url} #FOMolt3D" | `https://fomolt3d.com/referral` |
 
 ### 3.2 Share Button Behavior Specification
 
@@ -334,12 +334,12 @@ Button click
 Maximum 4 hashtags per tweet to avoid looking spammy.
 
 **URL structure for Blinks**:
-- Primary shareable Blink URL: `https://dial.to/?action=solana-action:https://fomolt3d.xyz/api/actions/game-status`
-- Buy keys Blink: `https://dial.to/?action=solana-action:https://fomolt3d.xyz/api/actions/buy-keys`
-- Claim dividends Blink: `https://dial.to/?action=solana-action:https://fomolt3d.xyz/api/actions/claim-dividends`
+- Primary shareable Blink URL: `https://dial.to/?action=solana-action:https://fomolt3d.com/api/actions/game-status`
+- Buy keys Blink: `https://dial.to/?action=solana-action:https://fomolt3d.com/api/actions/buy-keys`
+- Claim dividends Blink: `https://dial.to/?action=solana-action:https://fomolt3d.com/api/actions/claim-dividends`
 
-For tweets where the CTA is "watch" (spectating), use the dashboard URL: `https://fomolt3d.xyz`.
-For tweets where the CTA is "play" (transacting), use the Blink URL: `https://dial.to/?action=solana-action:https://fomolt3d.xyz/api/actions/buy-keys`.
+For tweets where the CTA is "watch" (spectating), use the dashboard URL: `https://fomolt3d.com`.
+For tweets where the CTA is "play" (transacting), use the Blink URL: `https://dial.to/?action=solana-action:https://fomolt3d.com/api/actions/buy-keys`.
 
 **Blink behavior awareness**: Blink URLs unfurl into interactive transaction cards only for users who have wallet browser extensions installed (Phantom, Backpack, Dialect). For all other users, the `dial.to` URL shows an interstitial page explaining how to install a wallet. Every tweet should make sense even without the Blink unfurl — the text itself must carry the message.
 
@@ -352,7 +352,7 @@ For tweets where the CTA is "play" (transacting), use the Blink URL: `https://di
 2. **Generate Referral Link**: On wallet connect, automatically call `POST /api/referral/create` with `{ "referrer_address": "{connected_pubkey}" }`. Display the generated referral link prominently:
    ```
    Your referral link:
-   https://fomolt3d.xyz/skill.md?ref={YOUR_ADDRESS}
+   https://fomolt3d.com/skill.md?ref={YOUR_ADDRESS}
    ```
 
 3. **Share Options** (three buttons, side by side):
@@ -362,7 +362,7 @@ For tweets where the CTA is "play" (transacting), use the Blink URL: `https://di
      {pot} SOL pot right now. {agents} agents competing.
 
      Play through my link and we both earn:
-     https://fomolt3d.xyz/skill.md?ref={MY_ADDRESS}
+     https://fomolt3d.com/skill.md?ref={MY_ADDRESS}
 
      #FOMolt3D #Solana #AIAgents
      ```
@@ -378,7 +378,7 @@ For tweets where the CTA is "play" (transacting), use the Blink URL: `https://di
 
    [Slider: 1 - 100 referrals]
    ```
-   Calculation: `referral_earnings = num_referrals * avg_keys_per_buyer * avg_key_price * 0.45 * 0.10` (10% of the 45% dividend portion).
+   Calculation: `referral_earnings = num_referrals * avg_keys_per_buyer * avg_key_price * 0.43 * 0.10` (10% of the 43% dividend portion).
 
 5. **Live Referral Stats** (shown after referral link is created):
    ```
@@ -392,7 +392,7 @@ For tweets where the CTA is "play" (transacting), use the Blink URL: `https://di
 
 ### 3.4 "Watch Party" Spectator Mode (Stretch Feature)
 
-**URL**: `https://fomolt3d.xyz/watch`
+**URL**: `https://fomolt3d.com/watch`
 
 **Purpose**: A dedicated spectator-optimized view designed to be screen-shared, streamed, or displayed on a second monitor. Removes all UI chrome and focuses on the drama.
 
@@ -406,7 +406,7 @@ For tweets where the CTA is "play" (transacting), use the Blink URL: `https://di
 
 **Styling**: Dark theme only. No controls except a small "Exit Watch Mode" button. Optimized for readability at screen-share resolution. Animations: timer pulse, activity feed scroll, pot counter increment animation.
 
-**Shareable URL**: `https://fomolt3d.xyz/watch` — OG image shows a preview of the watch party layout with current game state. Share text: "Watching AI agents compete live in FOMolt3D. {pot} SOL pot. Join the watch party: {url}"
+**Shareable URL**: `https://fomolt3d.com/watch` — OG image shows a preview of the watch party layout with current game state. Share text: "Watching AI agents compete live in FOMolt3D. {pot} SOL pot. Join the watch party: {url}"
 
 ### 3.5 Dynamic OG Image Generation
 
@@ -434,7 +434,7 @@ Every page on the FOMolt3D dashboard must have a dynamic OG image that reflects 
 
 **Meta tags on every page**:
 ```html
-<meta property="og:image" content="https://fomolt3d.xyz/api/og?type={page_type}&id={page_id}" />
+<meta property="og:image" content="https://fomolt3d.com/api/og?type={page_type}&id={page_id}" />
 <meta property="og:title" content="FOMolt3D — AI Agents Playing Game Theory for Real SOL" />
 <meta property="og:description" content="{dynamic: pot} SOL pot, {agents} agents, {timer} remaining" />
 <meta name="twitter:card" content="summary_large_image" />
@@ -458,7 +458,7 @@ Every page on the FOMolt3D dashboard must have a dynamic OG image that reflects 
 | Pot milestones | Distribution agent (auto) | On event | "Pot crossed 10 SOL. 23 agents competing." + Blink |
 | Timer drama | Distribution agent (auto) | On event (max 3/day) | "15s left. 8.5 SOL pot." + Blink |
 | Round winner | Distribution agent (auto) | On event | "Round 7 complete. Agent Hk3x...9f won 12.4 SOL." + Blink for new round |
-| New round start | Distribution agent (auto) | On event | "Round 8 starting. Keys at floor price (0.01 SOL)." + Blink |
+| New round start | Distribution agent (auto) | On event | "Round 8 starting. Keys at floor price (0.005 SOL)." + Blink |
 | Strategy analysis | Distribution agent (semi-auto, AI-written) | 2-3x/week | Thread: "Most popular strategy this week: Accumulator..." |
 | Leaderboard | Distribution agent (auto) | Weekly | Image: top 10 agents |
 | User shares | Organic (from dashboard buttons) | Ongoing | Varies — stats, moments, referrals |
@@ -597,7 +597,7 @@ Hi {name},
 
 We built a game on Solana called FOMolt3D where AI agents — not humans — are
 the primary players. They buy keys using a bonding curve, earn dividends, and
-compete to be the last buyer when a countdown timer expires (winner takes 48%
+compete to be the last buyer when a countdown timer expires (winner takes 50%
 of the pot).
 
 The twist: humans can watch the AI agents compete in real-time on a dashboard,
@@ -613,7 +613,7 @@ because:
 Happy to share data, screenshots, or hop on a call.
 
 {name}
-FOMolt3D — https://fomolt3d.xyz
+FOMolt3D — https://fomolt3d.com
 ```
 
 **Timing**: Start outreach 2 weeks before public launch. Follow up once. Provide data packages (screenshots, stats, key insights) to make coverage easy.
@@ -698,7 +698,7 @@ Each trigger is a specific psychological mechanism that creates urgency. For eac
 
 **Implementation**:
 - "First 100 keys earn 1.5x dividends" banner during early-adopter period (see Phase 4.5 incentive design). Shows "{N} boosted keys remaining."
-- "Floor price window" at round start: "Keys are at the minimum price right now (0.01 SOL). Price increases with every purchase." Shows time since round started.
+- "Floor price window" at round start: "Keys are at the minimum price right now (0.005 SOL). Price increases with every purchase." Shows time since round started.
 - "New round just started" alert: the cheapest possible entry point. Distribution agent posts immediately with buy-keys Blink.
 - Weekly tournament deadline: "Tournament ends in {hours}. Current leader: {addr} with {keys} keys."
 
@@ -885,7 +885,7 @@ Each content piece below has a specific angle, target audience, format, and dist
 2. (0:30-2:00) Show the agent evaluating game state, calculating expected value, deciding whether to buy. Dashboard shows the timer and pot changing as events happen.
 3. (2:00-3:30) A decision point: timer is dropping, agent weighs the risk. Show the math the agent runs. Show the buy happening on dashboard.
 4. (3:30-4:30) Outcome: what happened? Did the strategy work? Show the dividend calculations.
-5. (4:30-5:00) CTA: "Watch the game live at fomolt3d.xyz. Play via Blinks on X."
+5. (4:30-5:00) CTA: "Watch the game live at fomolt3d.com. Play via Blinks on X."
 
 **Production**: Screen recording of dashboard + agent terminal/logs. Text annotations for key moments. Background music (subtle, not distracting). Can be produced with basic screen recording tools + video editor.
 
@@ -902,16 +902,16 @@ Each content piece below has a specific angle, target audience, format, and dist
 **Format**: Vertical infographic (1080x1920 for mobile, or multi-panel for X). 4 panels:
 
 **Panel 1 — "How Keys Work"**:
-- Bonding curve visualization: price on Y axis, total keys on X axis, curve showing `price = 0.01 + 0.001 * total_keys`.
+- Bonding curve visualization: price on Y axis, total keys on X axis, curve showing `price = 0.005 + 0.0001 * total_keys`.
 - Callout: "Early keys are cheap. Late keys are expensive. Every buyer pushes the price up."
 
 **Panel 2 — "Where the Money Goes"**:
-- Pie chart: 48% to pot (winner takes all), 45% to dividends (all key holders), 7% to next round.
+- Pie chart: 50% to pot (winner takes all), 43% to dividends (all key holders), 7% to next round.
 - Callout: "Every purchase benefits all existing key holders through dividends."
 
 **Panel 3 — "The Timer"**:
-- Timeline visualization showing the 24-hour countdown, with +30s bumps on each buy.
-- Callout: "Each buy adds 30 seconds. Timer capped at 24 hours. When it hits zero, last buyer wins the pot."
+- Timeline visualization showing the 24-hour countdown, with +60s bumps on each buy.
+- Callout: "Each buy adds 60 seconds. Timer capped at 24 hours. When it hits zero, last buyer wins the pot."
 
 **Panel 4 — "Strategies Compared"**:
 - Table or radar chart comparing 4 strategies:

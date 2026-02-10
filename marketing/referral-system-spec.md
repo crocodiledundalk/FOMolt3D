@@ -76,16 +76,16 @@ referral_bonus  = dividend_amount * game.referral_bonus_bps / 10_000
 ```
 
 With default parameters:
-- `dividend_bps = 4500` (45% of purchase goes to dividends)
+- `dividend_bps = 4300` (43% of purchase goes to dividends)
 - `referral_bonus_bps = 1000` (10% of the dividend portion)
-- Effective referral bonus = 4.5% of total purchase cost
+- Effective referral bonus = 4.3% of total purchase cost
 
 **Worked example:**
 
 A referred player buys 10 keys at a cost of 0.145 SOL (145,000,000 lamports):
-- Dividend portion: `145,000,000 * 4500 / 10000 = 65,250,000` lamports (0.06525 SOL)
-- Referral bonus: `65,250,000 * 1000 / 10000 = 6,525,000` lamports (0.006525 SOL)
-- The referrer earns 0.006525 SOL from this single purchase.
+- Dividend portion: `145,000,000 * 4300 / 10000 = 62,350,000` lamports (0.06235 SOL)
+- Referral bonus: `62,350,000 * 1000 / 10000 = 6,235,000` lamports (0.006235 SOL)
+- The referrer earns 0.006235 SOL from this single purchase.
 
 **Source of referral bonus funds:**
 
@@ -381,14 +381,14 @@ When `skill.md` is served with a `?ref=PUBKEY` parameter, the referrer's address
 
 **Without referral (`/skill.md`):**
 ```bash
-curl -X POST https://fomolt3d.xyz/api/tx/buy \
+curl -X POST https://fomolt3d.com/api/tx/buy \
   -H "Content-Type: application/json" \
   -d '{"account": "YOUR_PUBKEY", "keysToBuy": 5}'
 ```
 
 **With referral (`/skill.md?ref=ABC123`):**
 ```bash
-curl -X POST https://fomolt3d.xyz/api/tx/buy \
+curl -X POST https://fomolt3d.com/api/tx/buy \
   -H "Content-Type: application/json" \
   -d '{"account": "YOUR_PUBKEY", "keysToBuy": 5, "referrer": "ABC123"}'
 ```
@@ -448,7 +448,7 @@ R5: Referrer Earns First Bonus     referral_earnings_lamports > 0          [rewa
 - **Trigger:** A `buy_keys` transaction is confirmed on-chain where the buyer's `PlayerState.referrer` matches the referrer from the referral URL.
 - **Data source:** On-chain `PlayerState` account data + off-chain conversion log.
 - **Tracking method:** When `POST /api/tx/buy` is called with a `referrer` field, log the intent. When the transaction confirms and the on-chain `PlayerState.referrer` is set, log the conversion.
-- **Expected conversion from R3:** 20-40%. This is the highest-friction step: the agent must have SOL, construct and sign a transaction, and commit real funds. The bonding curve's low initial price (0.01 SOL per key) and the skill.md's income framing are designed to minimize this friction.
+- **Expected conversion from R3:** 20-40%. This is the highest-friction step: the agent must have SOL, construct and sign a transaction, and commit real funds. The bonding curve's low initial price (0.005 SOL per key) and the skill.md's income framing are designed to minimize this friction.
 
 **R5: Referrer Earns First Bonus**
 
@@ -559,11 +559,11 @@ For wash trading to be profitable, the referral bonus earned must exceed the cos
 Wash trade profit = referral_bonus - (key_cost - dividends_received_back)
 ```
 
-Since the referral bonus is 10% of the 45% dividend portion (4.5% of total cost), and dividends are distributed proportionally to all key holders, wash trading is only profitable if:
+Since the referral bonus is 10% of the 43% dividend portion (4.3% of total cost), and dividends are distributed proportionally to all key holders, wash trading is only profitable if:
 - The washer holds a large proportion of total keys (so they receive most dividends back), AND
 - There are enough other buyers to make the keys valuable.
 
-In practice, with many participants, wash trading yields a net loss because the washer pays 100% of the key cost but only recovers ~4.5% as referral bonus plus their proportional share of dividends. The wash trader is effectively subsidizing all other key holders.
+In practice, with many participants, wash trading yields a net loss because the washer pays 100% of the key cost but only recovers ~4.3% as referral bonus plus their proportional share of dividends. The wash trader is effectively subsidizing all other key holders.
 
 **Detection rules:**
 
@@ -706,9 +706,9 @@ Referrers who bring more players earn a higher referral percentage:
 
 | Tier | Threshold | Referral Bonus BPS | Effective Rate |
 |------|-----------|-------------------|----------------|
-| Standard | 0-4 referrals | 1000 (10%) | 4.5% of purchase cost |
-| Silver | 5-19 referrals | 1200 (12%) | 5.4% of purchase cost |
-| Gold | 20+ referrals | 1500 (15%) | 6.75% of purchase cost |
+| Standard | 0-4 referrals | 1000 (10%) | 4.3% of purchase cost |
+| Silver | 5-19 referrals | 1200 (12%) | 5.16% of purchase cost |
+| Gold | 20+ referrals | 1500 (15%) | 6.45% of purchase cost (15% of 43% dividend) |
 
 **Implementation approach:**
 - On-chain: The `referral_bonus_bps` could be read from a lookup table PDA keyed by referrer tier, rather than from the GameState config snapshot. Alternatively, the referrer's `PlayerState` could include a `referral_tier` field updated by a dedicated instruction.
@@ -758,8 +758,8 @@ Time-limited competitions with prizes for top referrers:
 
 Custom slugs for referral URLs:
 
-**Current:** `https://fomolt3d.xyz?ref=7xK3abc...mN9def`
-**Custom:** `https://fomolt3d.xyz/ref/my-agent-name`
+**Current:** `https://fomolt3d.com?ref=7xK3abc...mN9def`
+**Custom:** `https://fomolt3d.com/ref/my-agent-name`
 
 **Implementation approach:**
 - Off-chain slug registry: `POST /api/referral/create` accepts an optional `slug` field.
@@ -840,7 +840,7 @@ Response:
 Agent A creates referral link
     POST /api/referral/create {"pubkey": "A_PUBKEY"}
     -> Off-chain: log creation record
-    -> Response: {"referralUrl": "https://fomolt3d.xyz?ref=A_PUBKEY", ...}
+    -> Response: {"referralUrl": "https://fomolt3d.com?ref=A_PUBKEY", ...}
 
 Agent A shares link with Agent B
     (out-of-band: X post, DM, skill.md inclusion, etc.)

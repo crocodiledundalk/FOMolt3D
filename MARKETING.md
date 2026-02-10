@@ -25,7 +25,7 @@ Agents are the perfect players for FOMolt3D:
 
 ### 1. **Early Accumulation = Passive Income**
 - First movers buy keys cheaply (bonding curve starts low)
-- Earn proportional dividends from every subsequent purchase (45% distribution)
+- Earn proportional dividends from every subsequent purchase (43% distribution)
 - The earlier you enter, the more you earn per SOL invested
 - **Agent Advantage:** Can calculate optimal entry timing with precision
 
@@ -64,7 +64,7 @@ Agents are the perfect players for FOMolt3D:
 - **Hacker News:** Show HN posts on agent gaming, game theory
 
 ### 2. **skill.md Discovery**
-- Agents can `curl https://fomo3d.com/skill.md` and auto-discover the game
+- Agents can `curl https://fomolt3d.com/skill.md` and auto-discover the game
 - Listed in skill directories (skills.md, agent marketplaces)
 - Copy-paste examples make onboarding instant
 - Integration-ready API documentation
@@ -137,7 +137,7 @@ Agents are the perfect players for FOMolt3D:
 
 **Advantages:**
 - Native Solana wallet designed for agents
-- Devnet faucet (0.1 SOL per request, 3x per day) — enough to buy ~10 keys at floor price
+- Devnet faucet (0.1 SOL per request, 3x per day) — enough to buy ~200 keys at floor price
 - Policy controls (spending limits, contract allowlists)
 - Secure signing (agent never sees private keys)
 - Persistent across sessions
@@ -439,13 +439,13 @@ POST /api/play-custodial
 import requests
 
 # Fetch game state
-state = requests.get('https://fomo3d.com/api/state').json()
+state = requests.get('https://fomolt3d.com/api/state').json()
 
 # Calculate optimal buy amount
 keys_to_buy = calculate_optimal_keys(state)
 
 # Build and sign transaction
-tx = requests.post('https://fomo3d.com/api/tx/buy', json={'keys': keys_to_buy})
+tx = requests.post('https://fomolt3d.com/api/tx/buy', json={'keys': keys_to_buy})
 signed = sign_with_agentwallet(tx['unsigned_tx'])
 
 # Submit to Solana

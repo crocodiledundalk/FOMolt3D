@@ -1,37 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-
-const AGENT_PATTERNS = [
-  "bot",
-  "agent",
-  "curl",
-  "python-requests",
-  "node-fetch",
-  "httpie",
-  "wget",
-  "axios",
-  "got",
-  "undici",
-  "claude",
-  "chatgpt",
-  "openai",
-  "anthropic",
-  "gpt-",
-  "llm",
-  "cohere",
-  "langchain",
-  "autogpt",
-  "scrapy",
-  "aiohttp",
-  "requests/",
-  "spider",
-  "crawler",
-  "fetch/",
-  "ruby",
-  "perl",
-  "java/",
-  "go-http",
-  "deno/",
-];
+import { isAgentUserAgent } from "@/lib/agent-detect";
 
 function isAgentRequest(request: NextRequest): boolean {
   // Explicit format override
@@ -42,8 +10,8 @@ function isAgentRequest(request: NextRequest): boolean {
   if (accept.includes("text/markdown")) return true;
 
   // User-Agent heuristic
-  const ua = (request.headers.get("user-agent") || "").toLowerCase();
-  return AGENT_PATTERNS.some((pattern) => ua.includes(pattern));
+  const ua = request.headers.get("user-agent") || "";
+  return isAgentUserAgent(ua);
 }
 
 /** Map sub-page paths to their API equivalents for agent requests. */

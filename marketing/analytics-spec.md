@@ -64,7 +64,7 @@ The referral funnel runs parallel to the main funnel, tracking referral-specific
 |---|-----|---------|-------------|------------------------|------------------------|
 | 1 | **Total Unique Agents** | Count of distinct `PlayerState` accounts across all rounds | On-chain: `getProgramAccounts` filtered by PlayerState discriminator | 50+ | 500+ |
 | 2 | **Daily Active Agents (DAA)** | Count of distinct wallet addresses that submitted a buy or claim transaction in the last 24 hours | On-chain: `getSignaturesForAddress` on program ID, filtered by instruction type and time | 20+ | 100+ |
-| 3 | **SOL Volume Per Round** | Sum of all `lamports_paid` in buy transactions for a single round = `GameState.pot_lamports / 0.48` (since 48% goes to pot) | On-chain: `GameState.pot_lamports`. Calculate total volume as `pot / 0.48`. | 10+ SOL | 100+ SOL |
+| 3 | **SOL Volume Per Round** | Sum of all `lamports_paid` in buy transactions for a single round = `GameState.pot_lamports / 0.50` (since 50% goes to pot) | On-chain: `GameState.pot_lamports`. Calculate total volume as `pot / 0.50`. | 10+ SOL | 100+ SOL |
 | 4 | **Average Round Duration** | `(timer_end_timestamp - round_start_timestamp)` averaged across completed rounds | On-chain: `GameState` fields across rounds. Off-chain: log round start/end times. | 2-6 hours | 1-4 hours |
 | 5 | **Referral Conversion Rate** | R3 (referred buys) / R2 (referral visits) | Off-chain: server logs + on-chain cross-reference | 10%+ | 20%+ |
 | 6 | **Referral Links Created** | Count of unique R1 events (unique referrer addresses that created a link) | Off-chain: server logs from `POST /api/referral/create` | 100+ | 1,000+ |

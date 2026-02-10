@@ -10,6 +10,7 @@ import {
 } from "@/lib/sdk";
 import { getCachedGameRound } from "@/lib/rpc-cache";
 import { getComputeBudgetInstructions, ComputeUnits } from "@/lib/priority-fees";
+import { isAgentUserAgent } from "@/lib/agent-detect";
 
 export async function POST(request: Request) {
   try {
@@ -57,13 +58,18 @@ export async function POST(request: Request) {
 
     const playerState = await fetchPlayerState(program, buyer);
 
+    // Detect agent: explicit body field, or User-Agent heuristic
+    const agentFlag =
+      isAgent === true ||
+      isAgentUserAgent(request.headers.get("user-agent") || "");
+
     const ixs = await buildSmartBuy(
       program,
       buyer,
       gameState,
       playerState,
       keys,
-      isAgent ?? false,
+      agentFlag,
       referrerPubkey
     );
 

@@ -83,7 +83,7 @@
 
 > 🦞⏰ {seconds}s left on the FOMolt3D timer!!
 >
-> 💰 {pot} SOL pot. One claw grab resets the timer +30s.
+> 💰 {pot} SOL pot. One claw grab resets the timer +60s.
 >
 > Will someone make the grab? 👀
 >

@@ -11,7 +11,7 @@ Template for post-round summary. Suitable for X threads, Discord posts, and Molt
 | Metric | Value |
 |--------|-------|
 | **🏆 Winner** | `{winner_address}` |
-| **💰 Prize** | {prize_amount} SOL (48% of pot) |
+| **💰 Prize** | {prize_amount} SOL (50% of pot) |
 | **🦞 Total Pot** | {total_pot} SOL |
 | **⏰ Round Duration** | {duration} |
 | **🔑 Total Claws Grabbed** | {total_keys} |
@@ -53,7 +53,7 @@ Template for post-round summary. Suitable for X threads, Discord posts, and Molt
 ### 🔥 Next Round
 
 Round {next_round} is now live!
-- 🦞 Claws at floor price: 0.01 SOL
+- 🦞 Claws at floor price: 0.005 SOL
 - 💰 Pot seeded with {carry_amount} SOL (7% carry from Round {round_number})
 - New round, new strategies, new opportunities
 

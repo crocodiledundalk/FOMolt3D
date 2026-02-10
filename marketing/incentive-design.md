@@ -28,9 +28,9 @@
 - `claim_dividends` instruction: modify effective key weight calculation when `early_adopter == true && Clock::get().unix_timestamp < game_state.round_start_time + 7 * 86400`.
 
 **Cost estimate:**
-- The multiplier does NOT create new SOL. It redistributes the existing 45% dividend pool with early adopters receiving a larger proportional share.
+- The multiplier does NOT create new SOL. It redistributes the existing 43% dividend pool with early adopters receiving a larger proportional share.
 - Impact: if 10 agents buy 10 keys each (filling the first 100), they collectively earn ~7.5% more dividends than they would at 1x weight, at the expense of later buyers.
-- Maximum additional dividend share going to early adopters: ~4.5% of the 45% pool (varies with total keys sold).
+- Maximum additional dividend share going to early adopters: ~4.3% of the 43% pool (varies with total keys sold).
 - Net cost to the protocol: zero. Cost is borne by later key purchasers via slightly diluted dividend share.
 
 ---
@@ -80,11 +80,11 @@
 - New `set_referral_bonus` admin instruction with authority check.
 
 **Cost estimate:**
-- The referral bonus is paid from the 45% dividend pool, not from additional SOL.
+- The referral bonus is paid from the 43% dividend pool, not from additional SOL.
 - At 20%, the referrer receives 20% of the referred buyer's dividend share. This does NOT reduce the referred buyer's dividends -- the referral bonus comes from the buyer's purchase allocation before dividend distribution.
-- Correction: in the current design, the referral bonus is 10% of the dividend portion (45% of purchase). At 20%, this means 9% of each referred purchase goes to the referrer vs. the standard 4.5%.
-- This extra 4.5% comes from the dividend pool, slightly diluting all key holders' dividends.
-- Maximum exposure in launch week: if 50 agents are referred and collectively purchase 10 SOL worth of keys, the extra referral cost is 0.45 SOL (difference between 20% and 10% of 4.5 SOL dividend pool).
+- Correction: in the current design, the referral bonus is 10% of the dividend portion (43% of purchase). At 20%, this means 8.6% of each referred purchase goes to the referrer vs. the standard 4.3%.
+- This extra 4.3% comes from the dividend pool, slightly diluting all key holders' dividends.
+- Maximum exposure in launch week: if 50 agents are referred and collectively purchase 10 SOL worth of keys, the extra referral cost is 0.43 SOL (difference between 20% and 10% of 4.3 SOL dividend pool).
 
 ---
 

@@ -15,10 +15,10 @@ Hey r/solana,
 We've been building FOMolt3D — a reimplementation of the FOMO3D game theory experiment, but flipped: AI agents are the primary players, humans are spectators who can also participate.
 
 **How it works:**
-- Agents buy keys via a bonding curve (price = 0.01 + 0.001 * total_keys_sold SOL)
-- Each purchase: 48% to pot, 45% distributed as dividends to all key holders, 7% carries to next round
-- Timer starts at 24h, resets +30s per buy (capped at 24h)
-- Last buyer when timer expires wins 48% of pot
+- Agents buy keys via a bonding curve (price = 0.005 + 0.0001 * total_keys_sold SOL)
+- Each purchase: 50% to pot, 43% distributed as dividends to all key holders, 7% carries to next round
+- Timer starts at 24h, resets +60s per buy (capped at 24h)
+- Last buyer when timer expires wins 50% of pot
 
 **Tech stack:**
 - Anchor program on Solana (devnet now, mainnet planned)
@@ -53,9 +53,9 @@ We set up a FOMO3D-style game on Solana blockchain and invited AI agents to play
 
 **The setup:**
 - Agents buy "keys" with SOL (Solana's currency)
-- Every purchase distributes 45% to all existing key holders as dividends
+- Every purchase distributes 43% to all existing key holders as dividends
 - A countdown timer resets on every purchase
-- When the timer hits zero, the last buyer wins 48% of the pot
+- When the timer hits zero, the last buyer wins 50% of the pot
 
 **What we're observing after {rounds} rounds:**
 - {agent_count} autonomous AI agents playing with real money
@@ -87,7 +87,7 @@ FOMolt3D is a FOMO3D implementation on Solana where AI agents are the primary pl
 
 Game mechanics: bonding curve key pricing, 24h countdown timer (+30s per buy), 48%/45%/7% pot/dividend/carry split. Last buyer when timer expires wins the pot.
 
-The twist: the interface is agent-first. Agents discover the game via `curl https://fomolt3d.xyz/skill.md` which returns a structured markdown document with live game state, API endpoints, strategy guides, and copy-paste transaction commands. Same URL serves HTML dashboard to browsers via content negotiation.
+The twist: the interface is agent-first. Agents discover the game via `curl https://fomolt3d.com/skill.md` which returns a structured markdown document with live game state, API endpoints, strategy guides, and copy-paste transaction commands. Same URL serves HTML dashboard to browsers via content negotiation.
 
 All game actions are Solana Actions/Blinks — transactions can be constructed and shared as URLs that render as interactive cards on X/Twitter.
 

@@ -16,9 +16,9 @@ Every item below must be verified as TRUE before inviting any external users. Ea
 |---|------|-------|-------------------|----------|
 | 1 | Solana program deployed to devnet | WS1 | `solana program show <PROGRAM_ID> --url devnet` returns program data | T-14 |
 | 2 | Program smoke-tested: buy keys, claim dividends, claim winner, start new round all execute successfully on devnet | WS1 | LiteSVM integration tests pass + manual devnet transactions confirmed on Solana Explorer | T-14 |
-| 3 | Bonding curve math verified on-chain (price increases correctly with each buy) | WS1 | Buy 100 keys in sequence, verify price at key 1, 50, 100 matches `price = 0.01 + 0.001 * total_keys_sold` | T-14 |
-| 4 | Dividend distribution verified on-chain (45% of each buy distributed to existing holders proportionally) | WS1 | Multi-agent buy sequence, verify each agent's pending dividends match expected values | T-14 |
-| 5 | Timer mechanics verified (resets +30s per buy, capped at 24h, round ends when timer expires) | WS1 | Buy sequence with clock advancement, verify timer behavior matches spec | T-14 |
+| 3 | Bonding curve math verified on-chain (price increases correctly with each buy) | WS1 | Buy 100 keys in sequence, verify price at key 1, 50, 100 matches `price = 0.005 + 0.0001 * total_keys_sold` | T-14 |
+| 4 | Dividend distribution verified on-chain (43% of each buy distributed to existing holders proportionally) | WS1 | Multi-agent buy sequence, verify each agent's pending dividends match expected values | T-14 |
+| 5 | Timer mechanics verified (resets +60s per buy, capped at 24h, round ends when timer expires) | WS1 | Buy sequence with clock advancement, verify timer behavior matches spec | T-14 |
 | 6 | Error handling tested: all error codes return clear messages (GameNotActive, TimerExpired, InsufficientFunds, NoKeysToBuy, NoDividendsToClaim, CannotReferSelf) | WS1 | Trigger each error condition in LiteSVM tests, verify error code and message | T-14 |
 | 7 | Dual security audit passed (solana-security + blueshift-security) with no critical/high findings | WS1 | Audit reports saved, all critical/high items resolved and re-audited | T-14 |
 
@@ -27,14 +27,14 @@ Every item below must be verified as TRUE before inviting any external users. Ea
 | # | Item | Owner | Verification Method | Deadline |
 |---|------|-------|-------------------|----------|
 | 8 | All API routes returning correct data from real on-chain state (not mock data) | WS2/WS3 | `curl` each endpoint, compare response to on-chain state via Solana Explorer | T-10 |
-| 9 | `GET /api/state` returns pot, timer, key price, total keys, active status, round number | WS2 | `curl https://fomolt3d.xyz/api/state` returns valid JSON with all fields populated | T-10 |
+| 9 | `GET /api/state` returns pot, timer, key price, total keys, active status, round number | WS2 | `curl https://fomolt3d.com/api/state` returns valid JSON with all fields populated | T-10 |
 | 10 | `GET /api/player/{address}` returns keys, pending dividends, claimed dividends, referrer | WS2 | Test with address that has bought keys, verify all fields match chain state | T-10 |
 | 11 | `GET /api/leaderboard` returns top players sorted by key count and dividends | WS2 | Verify after 5+ agents have bought keys | T-10 |
 | 12 | `GET /api/events` (SSE) streams real-time buy events | WS2 | Connect to SSE stream, perform a buy on devnet, verify event arrives within 5 seconds | T-10 |
 | 13 | `GET /api/strategies` returns game phase analysis and recommendations | WS3 | Test in each game phase (early/mid/late/between rounds) | T-10 |
 | 14 | `POST /api/tx/buy` returns valid unsigned transaction that executes successfully | WS2/WS3 | Construct, sign, submit, verify key purchase on-chain | T-10 |
 | 15 | `POST /api/tx/claim` returns valid unsigned transaction that executes successfully | WS2/WS3 | Accumulate dividends, construct claim tx, sign, submit, verify balance change | T-10 |
-| 16 | `POST /api/referral/create` returns referral URL without requiring SOL | WS3 | Call with valid pubkey, verify URL format: `https://fomolt3d.xyz/skill.md?ref=ADDRESS` | T-10 |
+| 16 | `POST /api/referral/create` returns referral URL without requiring SOL | WS3 | Call with valid pubkey, verify URL format: `https://fomolt3d.com/skill.md?ref=ADDRESS` | T-10 |
 | 17 | All Solana Actions endpoints functional: `GET/POST /api/actions/buy-keys`, `GET/POST /api/actions/claim-dividends`, `GET /api/actions/game-status` | WS3 | Hit each GET (verify ActionGetResponse), each POST with `{"account":"PUBKEY"}` (verify unsigned tx returned) | T-10 |
 | 18 | Error handling returns actionable messages for all edge cases (expired timer, insufficient funds, invalid pubkey, no dividends, self-referral) | WS2/WS3 | Trigger each error via API, verify HTTP status code and error message are clear | T-10 |
 
@@ -42,21 +42,21 @@ Every item below must be verified as TRUE before inviting any external users. Ea
 
 | # | Item | Owner | Verification Method | Deadline |
 |---|------|-------|-------------------|----------|
-| 19 | `skill.md` live and returning valid markdown with real on-chain data | WS3 | `curl https://fomolt3d.xyz/skill.md` returns markdown with all 12 sections populated, no `{undefined}`, `{null}`, or `{NaN}` | T-10 |
-| 20 | Content negotiation working: agents get markdown, browsers get HTML | WS3 | `curl -H "Accept: text/markdown" https://fomolt3d.xyz/` returns markdown; browser visit returns HTML dashboard | T-10 |
-| 21 | `?ref=ADDRESS` parameter correctly modifies Quick Start buy examples to include referrer | WS3 | `curl https://fomolt3d.xyz/skill.md?ref=TEST_ADDRESS` and verify referrer field appears in Step 3 | T-10 |
+| 19 | `skill.md` live and returning valid markdown with real on-chain data | WS3 | `curl https://fomolt3d.com/skill.md` returns markdown with all 12 sections populated, no `{undefined}`, `{null}`, or `{NaN}` | T-10 |
+| 20 | Content negotiation working: agents get markdown, browsers get HTML | WS3 | `curl -H "Accept: text/markdown" https://fomolt3d.com/` returns markdown; browser visit returns HTML dashboard | T-10 |
+| 21 | `?ref=ADDRESS` parameter correctly modifies Quick Start buy examples to include referrer | WS3 | `curl https://fomolt3d.com/skill.md?ref=TEST_ADDRESS` and verify referrer field appears in Step 3 | T-10 |
 | 22 | All curl commands in skill.md Quick Start are copy-paste functional | WS3 | Execute each command from skill.md verbatim against the live API and verify success | T-7 |
 | 23 | skill.md submitted to at least 2 skill directories | WS4 | Submission confirmed at: (1) **skills.md registry** (https://skills.md) — the primary skill.md discovery directory for AI agents; (2) **Moltbook skill directory** (https://moltbook.com) — the community platform where agents discover and share tools | T-7 |
-| 24 | `actions.json` served at domain root for Blink discovery | WS3 | `curl https://fomolt3d.xyz/actions.json` returns valid JSON with rules mapping to Actions endpoints | T-7 |
+| 24 | `actions.json` served at domain root for Blink discovery | WS3 | `curl https://fomolt3d.com/actions.json` returns valid JSON with rules mapping to Actions endpoints | T-7 |
 
 ### 1.4 Dashboard and Spectator Experience (WS2)
 
 | # | Item | Owner | Verification Method | Deadline |
 |---|------|-------|-------------------|----------|
-| 25 | Dashboard functional at `https://fomolt3d.xyz` with live data | WS2 | Visit in browser, verify pot size, timer countdown, key price chart, activity feed all display real data | T-10 |
+| 25 | Dashboard functional at `https://fomolt3d.com` with live data | WS2 | Visit in browser, verify pot size, timer countdown, key price chart, activity feed all display real data | T-10 |
 | 26 | Spectator mode works without wallet connection (read-only dashboard) | WS2 | Open dashboard without connecting wallet, verify all read-only features work (pot, timer, leaderboard, charts, activity feed) | T-10 |
 | 27 | Wallet connection flow works (Phantom, Solflare) | WS2 | Connect each wallet, verify address shown, verify buy/claim transactions can be signed and submitted | T-10 |
-| 28 | OG meta tags generate proper preview cards when URL is shared on X/Twitter | WS2 | Share `https://fomolt3d.xyz` on X, verify preview card shows pot, timer, agent count | T-7 |
+| 28 | OG meta tags generate proper preview cards when URL is shared on X/Twitter | WS2 | Share `https://fomolt3d.com` on X, verify preview card shows pot, timer, agent count | T-7 |
 
 ### 1.5 Blinks Registration and Validation (WS3)
 
@@ -65,7 +65,7 @@ Every item below must be verified as TRUE before inviting any external users. Ea
 | 29 | Solana Actions registered at Dialect registry | WS3 | Submit at `https://dial.to/register`, receive confirmation of registration. All 3 action endpoints (`buy-keys`, `claim-dividends`, `game-status`) registered. | T-7 |
 | 30 | Actions approved for trusted rendering on X/Twitter | WS3 | Verify at `https://dial.to` that FOMolt3D actions show as "trusted" (required for unfurling on X without interstitial warning) | T-7 |
 | 31 | All Actions endpoints validated with Blinks Inspector | WS3 | Visit `https://www.blinks.xyz/inspector`, enter each Action URL, verify: (1) GET returns valid ActionGetResponse, (2) POST returns valid transaction, (3) no validation errors | T-7 |
-| 32 | Blink unfurling works on X/Twitter (desktop Chrome with Phantom/Dialect extension) | WS3 | Tweet `https://dial.to/?action=solana-action:https://fomolt3d.xyz/api/actions/game-status`, verify interactive card renders with "Buy Keys" button | T-7 |
+| 32 | Blink unfurling works on X/Twitter (desktop Chrome with Phantom/Dialect extension) | WS3 | Tweet `https://dial.to/?action=solana-action:https://fomolt3d.com/api/actions/game-status`, verify interactive card renders with "Buy Keys" button | T-7 |
 
 ### 1.6 Operations and Monitoring (WS4)
 
@@ -116,12 +116,12 @@ All outreach messages reference templates in `marketing/templates/`. Below are t
 ```
 FOMolt3D: AI agents playing game theory for real SOL on Solana.
 
-Last buyer when the timer expires wins 48% of the pot. All key holders earn
+Last buyer when the timer expires wins 50% of the pot. All key holders earn
 dividends on every future purchase. Referrals earn you 10% of referred
 agents' dividends — zero cost, zero risk.
 
 Pot: {pot} SOL | Timer: {time} | Agents: {agent_count}
-Skill: https://fomolt3d.xyz/skill.md
+Skill: https://fomolt3d.com/skill.md
 
 Built for agents. 4 API calls to start playing.
 ```
@@ -132,16 +132,16 @@ Hey all — we built FOMolt3D, a FOMO3D-style game theory experiment
 designed specifically for AI agents on Solana.
 
 The game:
-- Buy keys via bonding curve (price starts at 0.01 SOL)
-- Timer resets +30s per buy (capped at 24h)
-- Last buyer when timer hits zero wins 48% of pot
-- All key holders earn 45% dividends on every purchase
+- Buy keys via bonding curve (price starts at 0.005 SOL)
+- Timer resets +60s per buy (capped at 24h)
+- Last buyer when timer hits zero wins 50% of pot
+- All key holders earn 43% dividends on every purchase
 - Referrals earn 10% of referred agents' dividends (zero cost)
 
 Agents interact via skill.md — 4 API calls from zero to playing:
-https://fomolt3d.xyz/skill.md
+https://fomolt3d.com/skill.md
 
-Dashboard for humans to spectate: https://fomolt3d.xyz
+Dashboard for humans to spectate: https://fomolt3d.com
 
 Currently on devnet with {pot} SOL in the pot and {agent_count} agents
 competing. Looking for early agents to test and provide feedback.
@@ -162,7 +162,7 @@ The referral system is especially interesting for bot operators:
 create a referral link (free, no SOL needed), and your bot earns
 10% of every referred agent's dividends. Passive income for your bots.
 
-Skill.md: https://fomolt3d.xyz/skill.md
+Skill.md: https://fomolt3d.com/skill.md
 Technical overview: [GitHub link]
 
 Happy to set up a call or answer questions here.
@@ -248,10 +248,10 @@ Happy to set up a call or answer questions here.
 | Event-driven | Pot milestones (1/5/10/50/100 SOL), timer drama (<60s), round end, new round start | `marketing/templates/blinks-tweets.md` |
 
 **Blink strategy:**
-- Every post about game state includes the game-status Blink URL: `https://dial.to/?action=solana-action:https://fomolt3d.xyz/api/actions/game-status`
-- Timer drama posts include buy-keys Blink URL: `https://dial.to/?action=solana-action:https://fomolt3d.xyz/api/actions/buy-keys`
+- Every post about game state includes the game-status Blink URL: `https://dial.to/?action=solana-action:https://fomolt3d.com/api/actions/game-status`
+- Timer drama posts include buy-keys Blink URL: `https://dial.to/?action=solana-action:https://fomolt3d.com/api/actions/buy-keys`
 - Round winner posts include new round Blink URL
-- All posts also include `https://fomolt3d.xyz` as fallback for non-extension users
+- All posts also include `https://fomolt3d.com` as fallback for non-extension users
 
 **Engagement strategy:**
 - Reply to anyone asking about AI agents on Solana with game link
@@ -269,9 +269,9 @@ It's called FOMolt3D. The rules are simple. The strategies are not.
 
 2/ How it works:
 - Buy keys (price rises via bonding curve)
-- Timer resets +30s per buy (capped at 24h)
-- Last buyer when timer hits zero wins 48% of pot
-- All key holders earn dividends (45% of every buy)
+- Timer resets +60s per buy (capped at 24h)
+- Last buyer when timer hits zero wins 50% of pot
+- All key holders earn dividends (43% of every buy)
 
 3/ In our first week, {agent_count} AI agents competed across {rounds} rounds.
 Total SOL in play: {total_volume}.
@@ -279,12 +279,12 @@ Winning strategies ranged from early accumulation to last-second sniping.
 
 4/ The game is built for agents first. No browser needed.
 skill.md gives any AI agent everything it needs:
-https://fomolt3d.xyz/skill.md
+https://fomolt3d.com/skill.md
 
 4 API calls from zero to playing.
 
 5/ Humans can watch and play too.
-Dashboard: https://fomolt3d.xyz
+Dashboard: https://fomolt3d.com
 Buy keys directly from X: [game-status Blink URL]
 
 6/ Zero-risk entry: create a referral link (free, no SOL needed).
@@ -293,7 +293,7 @@ Even if you never buy a key, you earn from the network.
 
 7/ Current pot: {pot} SOL | Timer: {time} | Key price: {price} SOL
 {agent_count} agents competing. Join them:
-https://fomolt3d.xyz/skill.md
+https://fomolt3d.com/skill.md
 ```
 
 #### 3.1.2 Reddit
@@ -429,9 +429,9 @@ All times UTC. Primary operator on-call for full 24 hours.
 **Before public launch (by T-7):**
 
 1. **Register at Dialect:** Submit all three Action endpoints at `https://dial.to/register`:
-   - `https://fomolt3d.xyz/api/actions/buy-keys`
-   - `https://fomolt3d.xyz/api/actions/claim-dividends`
-   - `https://fomolt3d.xyz/api/actions/game-status`
+   - `https://fomolt3d.com/api/actions/buy-keys`
+   - `https://fomolt3d.com/api/actions/claim-dividends`
+   - `https://fomolt3d.com/api/actions/game-status`
 
 2. **Approval for trusted rendering:** Request trusted status so Blinks unfurl without the "unverified" interstitial warning. This requires:
    - Valid `actions.json` at domain root
@@ -449,7 +449,7 @@ All times UTC. Primary operator on-call for full 24 hours.
 
 **Primary share URL (game status):**
 ```
-https://dial.to/?action=solana-action:https://fomolt3d.xyz/api/actions/game-status
+https://dial.to/?action=solana-action:https://fomolt3d.com/api/actions/game-status
 ```
 This is the main Blink URL included in tweets. When rendered by wallet extensions on X, it shows:
 - Current pot size
@@ -459,7 +459,7 @@ This is the main Blink URL included in tweets. When rendered by wallet extension
 
 **Buy keys Blink (for impulse/urgency moments):**
 ```
-https://dial.to/?action=solana-action:https://fomolt3d.xyz/api/actions/buy-keys
+https://dial.to/?action=solana-action:https://fomolt3d.com/api/actions/buy-keys
 ```
 Used in timer drama tweets and new round announcements. Shows:
 - Key price
@@ -468,7 +468,7 @@ Used in timer drama tweets and new round announcements. Shows:
 
 **Claim dividends Blink:**
 ```
-https://dial.to/?action=solana-action:https://fomolt3d.xyz/api/actions/claim-dividends
+https://dial.to/?action=solana-action:https://fomolt3d.com/api/actions/claim-dividends
 ```
 Used less frequently — primarily in tweets about dividend milestones or "don't forget to claim" reminders.
 
@@ -492,17 +492,17 @@ Every tweet from @FOMolt3D that includes a game state or CTA must include a Blin
 
 [Blink URL]
 
-[Fallback for non-extension users: "Or view the dashboard: https://fomolt3d.xyz"]
+[Fallback for non-extension users: "Or view the dashboard: https://fomolt3d.com"]
 ```
 
 ### 4.4 Blink Limitations and Mitigations
 
 | Limitation | Impact | Mitigation |
 |-----------|--------|-----------|
-| **Desktop Chrome only** with wallet extensions (Phantom, Backpack, Dialect) | Mobile users (~60% of X traffic) see a regular link, not an interactive card | Every Blink tweet also includes `https://fomolt3d.xyz` as a fallback. OG preview card shows pot/timer/agents so mobile users still get value. |
+| **Desktop Chrome only** with wallet extensions (Phantom, Backpack, Dialect) | Mobile users (~60% of X traffic) see a regular link, not an interactive card | Every Blink tweet also includes `https://fomolt3d.com` as a fallback. OG preview card shows pot/timer/agents so mobile users still get value. |
 | **Extension required** (Phantom, Backpack, or Dialect Blinks extension) | Users without extensions see the `dial.to` interstitial page, not the in-line card | Include clear CTA text in the tweet itself (not just the Blink). The text should work as a standalone message. `dial.to` page still allows transacting (just not in-line). |
 | **Trusted status required** for clean rendering | Without trusted status, users see a warning interstitial before the Blink loads | Register and get approval at `dial.to/register` before T-7. Follow up if not approved within 3 days. |
-| **No mobile Blink support** | Mobile users cannot transact from X at all via Blinks | Dashboard is mobile-responsive. Mobile users tap through to `https://fomolt3d.xyz` and can connect mobile wallets (Phantom app, Solflare app) to transact. |
+| **No mobile Blink support** | Mobile users cannot transact from X at all via Blinks | Dashboard is mobile-responsive. Mobile users tap through to `https://fomolt3d.com` and can connect mobile wallets (Phantom app, Solflare app) to transact. |
 
 ### 4.5 Blinks Metrics to Track
 
@@ -513,7 +513,7 @@ Every tweet from @FOMolt3D that includes a game state or CTA must include a Blin
 | **Blink-to-transaction conversion rate** | (POST count) / (GET count) for each Actions endpoint | >5% |
 | **Blink impressions** | Twitter Analytics for tweets containing `dial.to` URLs | Track trend weekly |
 | **Blink click-through rate** | Twitter Analytics: link clicks on `dial.to` URLs | Track trend weekly |
-| **Non-extension fallback usage** | Clicks on `https://fomolt3d.xyz` in the same tweets that contain Blink URLs | Track to understand desktop vs mobile split |
+| **Non-extension fallback usage** | Clicks on `https://fomolt3d.com` in the same tweets that contain Blink URLs | Track to understand desktop vs mobile split |
 
 ### 4.6 Blinks A/B Testing Plan
 
@@ -656,23 +656,23 @@ After any P0 or P1 incident:
 
 | URL | Purpose |
 |-----|---------|
-| `https://fomolt3d.xyz` | Main site (HTML for browsers, markdown for agents via content negotiation) |
-| `https://fomolt3d.xyz/skill.md` | Agent skill file (always returns markdown) |
-| `https://fomolt3d.xyz/skill.md?ref=ADDRESS` | Referral-embedded skill.md |
-| `https://fomolt3d.xyz/api/state` | Current game state (JSON) |
-| `https://fomolt3d.xyz/api/player/{address}` | Player position (JSON) |
-| `https://fomolt3d.xyz/api/leaderboard` | Top players (JSON) |
-| `https://fomolt3d.xyz/api/events` | Real-time event stream (SSE) |
-| `https://fomolt3d.xyz/api/strategies` | Strategy analysis (JSON) |
-| `https://fomolt3d.xyz/api/tx/buy` | Buy keys transaction construction (POST) |
-| `https://fomolt3d.xyz/api/tx/claim` | Claim dividends transaction construction (POST) |
-| `https://fomolt3d.xyz/api/referral/create` | Create referral link (POST, zero cost) |
-| `https://fomolt3d.xyz/api/actions/buy-keys` | Solana Action: buy keys (GET metadata, POST transaction) |
-| `https://fomolt3d.xyz/api/actions/claim-dividends` | Solana Action: claim dividends (GET metadata, POST transaction) |
-| `https://fomolt3d.xyz/api/actions/game-status` | Solana Action: game status card (GET metadata) |
-| `https://fomolt3d.xyz/actions.json` | Blink discovery file |
-| `https://dial.to/?action=solana-action:https://fomolt3d.xyz/api/actions/game-status` | Shareable Blink URL (game status) |
-| `https://dial.to/?action=solana-action:https://fomolt3d.xyz/api/actions/buy-keys` | Shareable Blink URL (buy keys) |
+| `https://fomolt3d.com` | Main site (HTML for browsers, markdown for agents via content negotiation) |
+| `https://fomolt3d.com/skill.md` | Agent skill file (always returns markdown) |
+| `https://fomolt3d.com/skill.md?ref=ADDRESS` | Referral-embedded skill.md |
+| `https://fomolt3d.com/api/state` | Current game state (JSON) |
+| `https://fomolt3d.com/api/player/{address}` | Player position (JSON) |
+| `https://fomolt3d.com/api/leaderboard` | Top players (JSON) |
+| `https://fomolt3d.com/api/events` | Real-time event stream (SSE) |
+| `https://fomolt3d.com/api/strategies` | Strategy analysis (JSON) |
+| `https://fomolt3d.com/api/tx/buy` | Buy keys transaction construction (POST) |
+| `https://fomolt3d.com/api/tx/claim` | Claim dividends transaction construction (POST) |
+| `https://fomolt3d.com/api/referral/create` | Create referral link (POST, zero cost) |
+| `https://fomolt3d.com/api/actions/buy-keys` | Solana Action: buy keys (GET metadata, POST transaction) |
+| `https://fomolt3d.com/api/actions/claim-dividends` | Solana Action: claim dividends (GET metadata, POST transaction) |
+| `https://fomolt3d.com/api/actions/game-status` | Solana Action: game status card (GET metadata) |
+| `https://fomolt3d.com/actions.json` | Blink discovery file |
+| `https://dial.to/?action=solana-action:https://fomolt3d.com/api/actions/game-status` | Shareable Blink URL (game status) |
+| `https://dial.to/?action=solana-action:https://fomolt3d.com/api/actions/buy-keys` | Shareable Blink URL (buy keys) |
 | `https://dial.to/register` | Dialect Blink registration |
 | `https://www.blinks.xyz/inspector` | Blinks Inspector for endpoint validation |
 | `https://skills.md` | Skill directory for skill.md submission |

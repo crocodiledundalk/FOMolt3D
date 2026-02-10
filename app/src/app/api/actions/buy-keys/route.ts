@@ -17,6 +17,7 @@ import { getCachedGameRound } from "@/lib/rpc-cache";
 import { formatSol, formatAddress, formatTime } from "@/lib/utils/format";
 import { ACTIONS_CORS_HEADERS, actionsOptions } from "@/lib/actions-headers";
 import { getComputeBudgetInstructions, ComputeUnits } from "@/lib/priority-fees";
+import { isAgentUserAgent } from "@/lib/agent-detect";
 
 // ---------------------------------------------------------------------------
 // GET — The shareable Blink card
@@ -209,13 +210,18 @@ export async function POST(request: Request) {
       }
     }
 
+    // Detect agent: explicit body field, or User-Agent heuristic
+    const isAgent =
+      body.isAgent === true ||
+      isAgentUserAgent(request.headers.get("user-agent") || "");
+
     const ixs = await buildSmartBuy(
       program,
       buyer,
       gameState,
       playerState,
       amount,
-      false, // isAgent=false for Blinks (human wallet)
+      isAgent,
       referrer
     );
 
