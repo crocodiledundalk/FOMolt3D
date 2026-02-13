@@ -48,6 +48,11 @@ pub struct BuyKeys<'info> {
     #[account(mut)]
     pub referrer_state: Option<Account<'info, PlayerState>>,
 
+    /// Optional referrer's wallet for direct referral payment.
+    /// CHECK: Validated in handler against referrer_state.player
+    #[account(mut)]
+    pub referrer_wallet: Option<UncheckedAccount<'info>>,
+
     pub system_program: Program<'info, System>,
 }
 
@@ -232,8 +237,8 @@ pub fn handle_buy_keys(ctx: Context<BuyKeys>, keys_to_buy: u64, is_agent: bool) 
         });
     }
 
-    // --- Transfer SOL: after_fee from buyer to vault (includes referral portion) ---
-    if after_fee > 0 {
+    // --- Transfer SOL: pot_contribution from buyer to vault ---
+    if pot_contribution > 0 {
         system_program::transfer(
             CpiContext::new(
                 ctx.accounts.system_program.to_account_info(),
@@ -242,7 +247,35 @@ pub fn handle_buy_keys(ctx: Context<BuyKeys>, keys_to_buy: u64, is_agent: bool) 
                     to: ctx.accounts.vault.to_account_info(),
                 },
             ),
-            after_fee,
+            pot_contribution,
+        )?;
+    }
+
+    // --- Transfer SOL: referral bonus directly from buyer to referrer wallet ---
+    if referral_bonus_paid > 0 {
+        let referrer_wallet = ctx
+            .accounts
+            .referrer_wallet
+            .as_ref()
+            .ok_or(FomoltError::ReferrerMismatch)?;
+        let referrer_state = ctx
+            .accounts
+            .referrer_state
+            .as_ref()
+            .ok_or(FomoltError::ReferrerMismatch)?;
+        require!(
+            referrer_wallet.key() == referrer_state.player,
+            FomoltError::ReferrerMismatch
+        );
+        system_program::transfer(
+            CpiContext::new(
+                ctx.accounts.system_program.to_account_info(),
+                system_program::Transfer {
+                    from: ctx.accounts.buyer.to_account_info(),
+                    to: referrer_wallet.to_account_info(),
+                },
+            ),
+            referral_bonus_paid,
         )?;
     }
 

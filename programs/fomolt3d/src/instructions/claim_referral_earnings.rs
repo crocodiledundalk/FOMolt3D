@@ -62,11 +62,18 @@ pub fn handle_claim_referral_earnings(ctx: Context<ClaimReferralEarnings>) -> Re
     let amount = player.referral_earnings_lamports;
     require!(amount > 0, FomoltError::NoReferralEarnings);
 
-    // --- Vault balance check ---
-    require!(
-        ctx.accounts.vault.lamports() >= amount,
-        FomoltError::InsufficientFunds
-    );
+    // Cap claim at vault's available balance to prevent over-draining.
+    // Referral earnings may span multiple rounds but this vault only holds
+    // SOL from one round. Protect winner/dividend/next_round funds.
+    let vault_balance = ctx.accounts.vault.lamports();
+    let reserved = game
+        .winner_pot
+        .checked_add(game.total_dividend_pool)
+        .and_then(|v| v.checked_add(game.next_round_pot))
+        .ok_or(FomoltError::Overflow)?;
+    let available = vault_balance.saturating_sub(reserved);
+    let amount = amount.min(available);
+    require!(amount > 0, FomoltError::InsufficientFunds);
 
     // --- Transfer from vault to player via CPI (vault is system-owned PDA) ---
     let vault_bump = ctx.bumps.vault;
@@ -89,7 +96,10 @@ pub fn handle_claim_referral_earnings(ctx: Context<ClaimReferralEarnings>) -> Re
         .claimed_referral_earnings_lamports
         .checked_add(amount)
         .ok_or(FomoltError::Overflow)?;
-    player.referral_earnings_lamports = 0;
+    player.referral_earnings_lamports = player
+        .referral_earnings_lamports
+        .checked_sub(amount)
+        .ok_or(FomoltError::Overflow)?;
 
     let clock = Clock::get()?;
     emit!(ReferralClaimed {

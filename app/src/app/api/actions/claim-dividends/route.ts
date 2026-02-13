@@ -6,6 +6,7 @@ import {
   getReadOnlyProgram,
   getConnection,
   fetchPlayerState,
+  fetchGameState,
   buildSmartClaim,
   getPlayerStatus,
   getGamePhase,
@@ -38,24 +39,45 @@ export async function GET(request: Request) {
       );
     }
 
-    const gs = result.gameState;
-    const state = toApiGameState(gs);
+    let gs = result.gameState;
     const phase = getGamePhase(gs);
 
-    // Show disabled state if round is still active
+    // If current round is active, check if there's a previous ended round
+    // with unclaimed dividends.
     if (phase === "active" || phase === "ending") {
-      return NextResponse.json(
-        {
-          type: "action",
-          icon: `${iconUrl}/icon.png`,
-          title: "FOMolt3D — Round Still Active",
-          description: `Round #${state.round} is still active. You can claim scraps once the timer expires.`,
-          label: "Round Active",
-          disabled: true,
-        },
-        { headers: ACTIONS_CORS_HEADERS }
-      );
+      if (gs.round > 1) {
+        const prevGs = await fetchGameState(program, gs.round - 1);
+        if (prevGs && !prevGs.active && prevGs.totalKeys > 0) {
+          gs = prevGs; // Use the previous round for the claim UI
+        } else {
+          return NextResponse.json(
+            {
+              type: "action",
+              icon: `${iconUrl}/icon.png`,
+              title: "FOMolt3D — Round Still Active",
+              description: `Round #${gs.round} is still active. You can claim scraps once the timer expires.`,
+              label: "Round Active",
+              disabled: true,
+            },
+            { headers: ACTIONS_CORS_HEADERS }
+          );
+        }
+      } else {
+        return NextResponse.json(
+          {
+            type: "action",
+            icon: `${iconUrl}/icon.png`,
+            title: "FOMolt3D — Round Still Active",
+            description: `Round #${gs.round} is still active. You can claim scraps once the timer expires.`,
+            label: "Round Active",
+            disabled: true,
+          },
+          { headers: ACTIONS_CORS_HEADERS }
+        );
+      }
     }
+
+    const state = toApiGameState(gs);
 
     const response = {
       type: "action",

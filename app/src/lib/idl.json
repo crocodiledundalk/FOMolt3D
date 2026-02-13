@@ -111,6 +111,14 @@
           "optional": true
         },
         {
+          "name": "referrer_wallet",
+          "docs": [
+            "Optional referrer's wallet for direct referral payment."
+          ],
+          "writable": true,
+          "optional": true
+        },
+        {
           "name": "system_program",
           "address": "11111111111111111111111111111111"
         }

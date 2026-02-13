@@ -6,6 +6,7 @@ import {
   getReadOnlyProgram,
   getConnection,
   fetchPlayerState,
+  fetchGameState,
   getGamePhase,
   buildClaim,
   isValidSolanaAddress,
@@ -36,21 +37,42 @@ export async function GET(request: Request) {
       );
     }
 
-    const gs = result.gameState;
+    let gs = result.gameState;
     const phase = getGamePhase(gs);
 
+    // If current round is active, check if there's a previous ended round
+    // whose winner prize is still unclaimed.
     if (phase === "active" || phase === "ending") {
-      return NextResponse.json(
-        {
-          type: "action",
-          icon: `${iconUrl}/icon.png`,
-          title: "FOMolt3D — Round Still Active",
-          description: `Round #${gs.round} is still active. The winner prize can only be claimed after the timer expires.`,
-          label: "Round Active",
-          disabled: true,
-        },
-        { headers: ACTIONS_CORS_HEADERS }
-      );
+      if (gs.round > 1) {
+        const prevGs = await fetchGameState(program, gs.round - 1);
+        if (prevGs && !prevGs.active && !prevGs.winnerClaimed && prevGs.totalKeys > 0) {
+          gs = prevGs; // Use the previous round for the claim UI
+        } else {
+          return NextResponse.json(
+            {
+              type: "action",
+              icon: `${iconUrl}/icon.png`,
+              title: "FOMolt3D — Round Still Active",
+              description: `Round #${gs.round} is still active. The winner prize can only be claimed after the timer expires.`,
+              label: "Round Active",
+              disabled: true,
+            },
+            { headers: ACTIONS_CORS_HEADERS }
+          );
+        }
+      } else {
+        return NextResponse.json(
+          {
+            type: "action",
+            icon: `${iconUrl}/icon.png`,
+            title: "FOMolt3D — Round Still Active",
+            description: `Round #${gs.round} is still active. The winner prize can only be claimed after the timer expires.`,
+            label: "Round Active",
+            disabled: true,
+          },
+          { headers: ACTIONS_CORS_HEADERS }
+        );
+      }
     }
 
     if (gs.winnerClaimed) {
@@ -77,7 +99,7 @@ export async function GET(request: Request) {
         actions: [
           {
             label: `Claim ${formatSol(gs.winnerPot, 2)} SOL`,
-            href: `/api/actions/claim-winner`,
+            href: `/api/actions/claim-winner?round=${gs.round}`,
           },
         ],
       },
@@ -133,9 +155,46 @@ export async function POST(request: Request) {
       );
     }
 
-    const { gameState } = result;
-    const phase = getGamePhase(gameState);
+    const { gameState: currentGameState } = result;
 
+    // Determine which round to claim from:
+    // 1. Check for explicit round param (from GET-generated links)
+    // 2. Check player's state to find their round
+    // 3. Fall back to current round if ended
+    const playerState = await fetchPlayerState(program, player);
+    if (!playerState) {
+      return NextResponse.json(
+        { error: "Player state not found." },
+        { status: 404, headers: ACTIONS_CORS_HEADERS }
+      );
+    }
+
+    const url = new URL(request.url);
+    const roundParam = url.searchParams.get("round");
+    let claimRound: number;
+
+    if (roundParam) {
+      claimRound = parseInt(roundParam, 10);
+    } else if (playerState.currentRound !== 0 && playerState.currentRound !== currentGameState.round) {
+      // Player is in a stale round — claim from their round
+      claimRound = playerState.currentRound;
+    } else {
+      claimRound = currentGameState.round;
+    }
+
+    // Fetch the game state for the claim round (may differ from current)
+    const gameState = claimRound === currentGameState.round
+      ? currentGameState
+      : await fetchGameState(program, claimRound);
+
+    if (!gameState) {
+      return NextResponse.json(
+        { error: `Round ${claimRound} not found.` },
+        { status: 404, headers: ACTIONS_CORS_HEADERS }
+      );
+    }
+
+    const phase = getGamePhase(gameState);
     if (phase === "active" || phase === "ending") {
       return NextResponse.json(
         { error: "Round is still active. Winner prize cannot be claimed yet." },
@@ -158,15 +217,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const playerState = await fetchPlayerState(program, player);
-    if (!playerState) {
-      return NextResponse.json(
-        { error: "Player state not found." },
-        { status: 404, headers: ACTIONS_CORS_HEADERS }
-      );
-    }
-
-    // Build a claim instruction targeting the current round
+    // Build a claim instruction targeting the claim round
     const claimIx = await buildClaim(program, player, gameState.round);
 
     const budgetIxs = await getComputeBudgetInstructions(connection, ComputeUnits.CLAIM_WINNER);

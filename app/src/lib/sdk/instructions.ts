@@ -36,6 +36,7 @@ export async function buildBuyKeys(
       vault: vaultPDA,
       protocolWallet,
       referrerState: referrer ? getPlayerStatePDA(referrer)[0] : null,
+      referrerWallet: referrer ?? null,
       systemProgram: SystemProgram.programId,
     })
     .instruction();

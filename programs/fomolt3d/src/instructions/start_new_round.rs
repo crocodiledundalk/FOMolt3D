@@ -94,18 +94,50 @@ pub fn handle_start_new_round(ctx: Context<StartNewRound>) -> Result<()> {
     // to prevent carry-over lamports from being permanently trapped.
     // For normal rounds, forward only next_round_pot (other vault funds
     // belong to players who haven't claimed yet).
+    let vault_balance = ctx.accounts.prev_vault.lamports();
     let carry_over = if prev_game.total_keys == 0 {
-        ctx.accounts.prev_vault.lamports()
+        vault_balance
     } else {
-        prev_game.next_round_pot
+        let desired = prev_game.next_round_pot;
+        let remaining = vault_balance.saturating_sub(desired);
+        // If the remaining balance would sit below rent-exempt, drain the
+        // full vault to zero so the runtime GCs it cleanly. The tiny dust
+        // (from integer rounding in dividend claims) rolls into the next
+        // round's pot — negligible and safe.
+        let rent = Rent::get()?;
+        let min_rent = rent.minimum_balance(0);
+        if remaining > 0 && remaining < min_rent {
+            vault_balance
+        } else {
+            desired
+        }
     };
 
     // --- Vault balance check before carry-over transfer ---
     if carry_over > 0 {
         require!(
-            ctx.accounts.prev_vault.lamports() >= carry_over,
+            vault_balance >= carry_over,
             FomoltError::InsufficientFunds
         );
+
+        // If carry_over alone won't make new_vault rent-exempt,
+        // have payer cover the gap so the runtime doesn't reject
+        // with InsufficientFundsForRent.
+        let rent = Rent::get()?;
+        let min_rent_vault = rent.minimum_balance(0);
+        if carry_over < min_rent_vault {
+            let gap = min_rent_vault.saturating_sub(carry_over);
+            system_program::transfer(
+                CpiContext::new(
+                    ctx.accounts.system_program.to_account_info(),
+                    system_program::Transfer {
+                        from: ctx.accounts.payer.to_account_info(),
+                        to: ctx.accounts.new_vault.to_account_info(),
+                    },
+                ),
+                gap,
+            )?;
+        }
 
         let signer_seeds: &[&[&[u8]]] =
             &[&[b"vault", prev_game_key.as_ref(), &[prev_vault_bump]]];

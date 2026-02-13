@@ -117,6 +117,14 @@ export type Fomolt3d = {
           "optional": true
         },
         {
+          "name": "referrerWallet",
+          "docs": [
+            "Optional referrer's wallet for direct referral payment."
+          ],
+          "writable": true,
+          "optional": true
+        },
+        {
           "name": "systemProgram",
           "address": "11111111111111111111111111111111"
         }
